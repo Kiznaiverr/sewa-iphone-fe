@@ -1,5 +1,5 @@
 import { Sidebar } from '../../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage, EmptyState, showAlertModal } from '../../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage, EmptyState, Modal, closeModal, showAlertModal, showUserActionModal } from '../../components/common/Components.js';
 import { adminAPI } from '../../js/api/endpoints.js';
 import { isAdmin } from '../../js/utils/helpers.js';
 
@@ -130,43 +130,77 @@ async function loadAdminUsers(status = 'active') {
 
     searchInput.addEventListener('input', applySearch);
 
+    // simple HTML escape to avoid injection when inserting values into modal
+    const escapeHtml = (unsafe) => {
+      return String(unsafe || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    };
+
     window.editUser = (userId) => {
       const user = users.find(u => u.id === userId);
       if (!user) return;
 
-      const name = prompt('Nama:', user.name);
-      if (name === null) return;
+      const content = `
+        <div class="space-y-4">
+          <label class="block text-sm font-medium text-neutral-700">Nama</label>
+          <input id="edit-user-name" type="text" value="${escapeHtml(user.name)}" class="input w-full" />
+          <label class="block text-sm font-medium text-neutral-700">Email</label>
+          <input id="edit-user-email" type="email" value="${escapeHtml(user.email)}" class="input w-full" />
+        </div>
+      `;
 
-      adminAPI.users.update(userId, { name })
-        .then(() => {
-          showAlertModal('Pengguna berhasil diupdate!', true);
-          loadAdminUsers(status);
-        })
-        .catch(err => {
+      const footer = `
+        <button onclick="closeModal()" class="px-4 py-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-all duration-200 font-medium">Batal</button>
+        <button onclick="window.__saveUserEdit(${userId})" class="btn btn-primary">Simpan</button>
+      `;
+
+      const modalHtml = Modal('Edit Pengguna', content, footer);
+
+      let modalContainer = document.getElementById('modal-container');
+      if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'modal-container';
+        document.body.appendChild(modalContainer);
+      }
+
+      modalContainer.innerHTML = modalHtml;
+
+      // attach save handler globally so inline onclick can call it
+      window.__saveUserEdit = async (id) => {
+        const name = document.getElementById('edit-user-name')?.value;
+        const email = document.getElementById('edit-user-email')?.value;
+
+        try {
+          await adminAPI.users.update(id, { name, email });
+          closeModal();
+          showAlertModal('Pengguna berhasil diupdate!', true, () => loadAdminUsers(status));
+        } catch (err) {
           console.error('Error updating user:', err);
+          closeModal();
           showAlertModal('Gagal mengupdate pengguna', false);
-        });
+        }
+      };
     };
 
     window.deleteUser = async (userId, type) => {
+      const title = type === 'soft' ? 'Nonaktifkan Pengguna' : 'Hapus Pengguna';
       const message = type === 'soft'
-        ? 'Nonaktifkan pengguna ini?'
+        ? 'Nonaktifkan pengguna ini? Pengguna masih bisa diaktifkan kembali.'
         : 'Hapus permanen pengguna ini? Tindakan ini tidak dapat dibatalkan!';
 
-      if (!confirm(message)) return;
-
-      try {
-        if (type === 'soft') {
-          await adminAPI.users.softDelete(userId);
-        } else {
-          await adminAPI.users.delete(userId);
+      showUserActionModal(title, message, async () => {
+        try {
+          if (type === 'soft') {
+            await adminAPI.users.softDelete(userId);
+          } else {
+            await adminAPI.users.delete(userId);
+          }
+          showAlertModal('Pengguna berhasil dihapus!', true);
+          loadAdminUsers(status);
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          showAlertModal('Gagal menghapus pengguna', false);
         }
-        showAlertModal('Pengguna berhasil dihapus!', true);
-        loadAdminUsers(status);
-      } catch (error) {
-        console.error('Error deleting user:', error);
-        showAlertModal('Gagal menghapus pengguna', false);
-      }
+      });
     };
   } catch (error) {
     console.error('Error loading admin users:', error);

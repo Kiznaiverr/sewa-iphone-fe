@@ -1,5 +1,5 @@
 import { Sidebar} from '../../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage, EmptyState, showAlertModal } from '../../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage, EmptyState, Modal, closeModal, showAlertModal, showUserActionModal } from '../../components/common/Components.js';
 import { adminAPI } from '../../js/api/endpoints.js';
 import { formatCurrency, isAdmin } from '../../js/utils/helpers.js';
 
@@ -135,19 +135,84 @@ async function loadAdminIphones() {
     searchInput.addEventListener('input', applyFilters);
     statusFilter.addEventListener('change', applyFilters);
 
-    window.editIphone = (id) => {
-      window.location.href = `/admin/iphones/${id}/edit`;
+    // simple HTML escape to avoid injection when inserting values into modal
+    const escapeHtml = (unsafe) => {
+      return String(unsafe || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     };
 
-    window.deleteIphone = async (id) => {
-      if (confirm('Yakin ingin menghapus iPhone ini?')) {
+    window.editIphone = (id) => {
+      const iphone = iphones.find(i => i.id === id);
+      if (!iphone) return;
+
+      const content = `
+        <div class="space-y-4">
+          <label class="block text-sm font-medium text-neutral-700">Nama</label>
+          <input id="edit-iphone-name" type="text" value="${escapeHtml(iphone.name)}" class="input w-full" />
+
+          <label class="block text-sm font-medium text-neutral-700">Harga per Hari</label>
+          <input id="edit-iphone-price" type="number" value="${iphone.price_per_day}" class="input w-full" />
+
+          <label class="block text-sm font-medium text-neutral-700">Spesifikasi</label>
+          <textarea id="edit-iphone-specs" class="input w-full" rows="3">${escapeHtml(iphone.specs || '')}</textarea>
+
+          <label class="block text-sm font-medium text-neutral-700">Stok</label>
+          <input id="edit-iphone-stock" type="number" value="${iphone.stock}" class="input w-full" />
+
+          <label class="block text-sm font-medium text-neutral-700">Status</label>
+          <select id="edit-iphone-status" class="input w-full">
+            <option value="active" ${iphone.status === 'active' ? 'selected' : ''}>Aktif</option>
+            <option value="inactive" ${iphone.status === 'inactive' ? 'selected' : ''}>Tidak Aktif</option>
+          </select>
+        </div>
+      `;
+
+      const footer = `
+        <button onclick="closeModal()" class="px-4 py-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-all duration-200 font-medium">Batal</button>
+        <button onclick="window.__saveIphoneEdit(${id})" class="btn btn-primary">Simpan</button>
+      `;
+
+      const modalHtml = Modal('Edit iPhone', content, footer);
+
+      let modalContainer = document.getElementById('modal-container');
+      if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'modal-container';
+        document.body.appendChild(modalContainer);
+      }
+
+      modalContainer.innerHTML = modalHtml;
+
+      // attach save handler globally so inline onclick can call it
+      window.__saveIphoneEdit = async (iphoneId) => {
+        const name = document.getElementById('edit-iphone-name')?.value;
+        const price_per_day = parseFloat(document.getElementById('edit-iphone-price')?.value);
+        const specs = document.getElementById('edit-iphone-specs')?.value;
+        const stock = parseInt(document.getElementById('edit-iphone-stock')?.value);
+        const status = document.getElementById('edit-iphone-status')?.value;
+
+        try {
+          await adminAPI.iphones.update(iphoneId, { name, price_per_day, specs, stock, status });
+          closeModal();
+          showAlertModal('iPhone berhasil diupdate!', true, () => loadAdminIphones());
+        } catch (err) {
+          console.error('Error updating iphone:', err);
+          closeModal();
+          showAlertModal('Gagal mengupdate iPhone', false);
+        }
+      };
+    };
+
+    window.deleteIphone = (id) => {
+      showUserActionModal('Hapus iPhone', 'Yakin ingin menghapus iPhone ini? Tindakan ini tidak dapat dibatalkan!', async () => {
         try {
           await adminAPI.iphones.delete(id);
+          showAlertModal('iPhone berhasil dihapus!', true);
           loadAdminIphones();
         } catch (error) {
+          console.error('Error deleting iphone:', error);
           showAlertModal('Gagal menghapus iPhone', false);
         }
-      }
+      });
     };
   } catch (error) {
     console.error('Error loading admin iphones:', error);
