@@ -11,6 +11,13 @@ export const authAPI = {
 export const userAPI = {
   getProfile: () => apiClient.get('/api/user/profile'),
   updateProfile: (data) => apiClient.put('/api/user/profile', data),
+  uploadProfilePhoto: (file) => {
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+    return apiClient.post('/api/user/upload-profile-photo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
   getOrders: () => apiClient.get('/api/order/user'),
   trackOrder: (code) => apiClient.get(`/api/order/track/${code}`),
   createOrder: (data) => apiClient.post('/api/order', data),

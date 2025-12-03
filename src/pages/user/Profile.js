@@ -31,10 +31,35 @@ export async function ProfilePage() {
             </div>
           </div>
 
-          <div class='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-            <!-- Profile Info -->
+          <div class='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+            <!-- Profile Info & Photo -->
             <div class='lg:col-span-2'>
-              <div class='card mb-6'>
+              <!-- Profile Photo -->
+              <div class='card mb-4'>
+                <div class='flex flex-col sm:flex-row items-center gap-6'>
+                  <div class='flex-shrink-0'>
+                    <div class='relative'>
+                      <div class='w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-neutral-200'>
+                        <img id='profile-photo' src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg' alt='Foto Profil' class='w-full h-full object-cover'>
+                      </div>
+                      <button class='absolute bottom-0 right-0 bg-primary text-white rounded-full p-2 hover:bg-primary-600 transition-colors shadow-lg border-2 border-white' title='Ubah Foto'>
+                        <svg class='w-4 h-4' fill='none' stroke='#374151' viewBox='0 0 24 24'>
+                          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z'></path>
+                          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 13a3 3 0 11-6 0 3 3 0 016 0z'></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class='flex-1 text-center sm:text-left'>
+                    <h2 id='profile-username' class='text-xl font-bold mb-2'>Foto Profil</h2>
+                    <p class='text-sm text-neutral-500'>Klik ikon kamera untuk mengubah foto profil</p>
+                    <input type='file' id='profile-photo-input' accept='image/jpeg,image/jpg,image/png' class='hidden'>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Profile Info -->
+              <div class='card mb-4'>
                 <h2 class='text-xl font-bold mb-6'>Informasi Pribadi</h2>
                 <div id='profile-info'>
                   ${LoadingSpinner()}
@@ -42,7 +67,7 @@ export async function ProfilePage() {
               </div>
 
               <!-- Edit Profile Form (Hidden by default) -->
-              <div id='edit-profile-form' class='card hidden'>
+              <div id='edit-profile-form' class='card hidden mb-4'>
                 <h2 class='text-xl font-bold mb-6'>Edit Profil</h2>
                 <form id='profile-form' class='space-y-4'>
                   <div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -72,7 +97,7 @@ export async function ProfilePage() {
             </div>
 
             <!-- Sidebar -->
-            <div>
+            <div class='lg:col-span-1'>
               <div class='card'>
                 <h3 class='font-bold mb-4'>Menu</h3>
                 <div class='space-y-2'>
@@ -94,6 +119,13 @@ export async function ProfilePage() {
 
   loadProfile();
   setupFormHandlers();
+  
+  // Setup photo upload handlers after DOM is fully ready
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      setupPhotoUploadHandlers();
+    }, 200);
+  });
 }
 
 async function loadProfile() {
@@ -109,34 +141,56 @@ async function loadProfile() {
       verificationAlert.classList.add('hidden');
     }
 
+    // Update profile photo
+    const profilePhoto = document.getElementById('profile-photo');
+    const defaultPhoto = 'https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg';
+
+    if (profile.profile) {
+      profilePhoto.src = profile.profile;
+      // Handle image load error
+      profilePhoto.onerror = function() {
+        this.src = defaultPhoto;
+      };
+    } else {
+      profilePhoto.src = defaultPhoto;
+    }
+
+    // Update username in heading
+    const usernameElement = document.getElementById('profile-username');
+    if (usernameElement && profile.username) {
+      usernameElement.textContent = profile.username;
+    }
+
     document.getElementById('profile-info').innerHTML = `
-      <div class='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        <div>
-          <label class='block text-sm font-medium text-neutral-500 mb-1'>Nama Lengkap</label>
-          <p class='text-lg font-medium'>${profile.name || '-'}</p>
-        </div>
-        <div>
-          <label class='block text-sm font-medium text-neutral-500 mb-1'>Email</label>
-          <p class='text-lg'>${profile.email || '-'}</p>
-        </div>
-        <div>
-          <label class='block text-sm font-medium text-neutral-500 mb-1'>Nomor Telepon</label>
-          <p class='text-lg'>${profile.phone || '-'}</p>
-        </div>
-        <div>
-          <label class='block text-sm font-medium text-neutral-500 mb-1'>NIK</label>
-          <p class='text-lg'>${profile.nik || '-'}</p>
-        </div>
-        <div>
-          <label class='block text-sm font-medium text-neutral-500 mb-1'>Role</label>
-          <p class='text-lg capitalize'>${profile.role || 'user'}</p>
-        </div>
-        <div>
-          <label class='block text-sm font-medium text-neutral-500 mb-1'>Status Verifikasi</label>
-          <div class='flex items-center gap-2'>
-            ${profile.isverified ? 
-              '<span class="badge badge-success">Terverifikasi</span>' : 
-              '<span class="badge badge-warning">Belum Terverifikasi</span>'}
+      <div class='space-y-6'>
+        <div class='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div>
+            <label class='block text-sm font-medium text-neutral-500 mb-1'>Nama Lengkap</label>
+            <p class='text-lg font-medium break-words'>${profile.name || '-'}</p>
+          </div>
+          <div>
+            <label class='block text-sm font-medium text-neutral-500 mb-1'>Email</label>
+            <p class='text-lg break-words'>${profile.email || '-'}</p>
+          </div>
+          <div>
+            <label class='block text-sm font-medium text-neutral-500 mb-1'>Nomor Telepon</label>
+            <p class='text-lg break-words'>${profile.phone || '-'}</p>
+          </div>
+          <div>
+            <label class='block text-sm font-medium text-neutral-500 mb-1'>NIK</label>
+            <p class='text-lg break-words'>${profile.nik || '-'}</p>
+          </div>
+          <div>
+            <label class='block text-sm font-medium text-neutral-500 mb-1'>Role</label>
+            <p class='text-lg capitalize'>${profile.role || 'user'}</p>
+          </div>
+          <div>
+            <label class='block text-sm font-medium text-neutral-500 mb-1'>Status Verifikasi</label>
+            <div class='flex items-center gap-2'>
+              ${profile.isverified ? 
+                '<span class="badge badge-success">Terverifikasi</span>' : 
+                '<span class="badge badge-warning">Belum Terverifikasi</span>'}
+            </div>
           </div>
         </div>
         <div>
@@ -159,6 +213,90 @@ async function loadProfile() {
     );
   }
 }
+
+function setupPhotoUploadHandlers() {
+  const fileInput = document.getElementById('profile-photo-input');
+  const cameraBtn = document.querySelector('button[title="Ubah Foto"]');
+
+  if (cameraBtn) {
+    cameraBtn.addEventListener('click', function() {
+      const currentFileInput = document.getElementById('profile-photo-input');
+      if (currentFileInput) {
+        currentFileInput.click();
+      }
+    });
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+          showNotification('Format file tidak didukung. Gunakan JPEG, JPG, atau PNG.', 'error');
+          this.value = '';
+          return;
+        }
+
+        // Validate file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (file.size > maxSize) {
+          showNotification('Ukuran file terlalu besar. Maksimal 5MB.', 'error');
+          this.value = '';
+          return;
+        }
+
+        // Auto upload the file
+        await uploadProfilePhoto(file);
+      }
+    });
+  }
+}
+
+async function uploadProfilePhoto(file) {
+  const fileInput = document.getElementById('profile-photo-input');
+
+  // Show loading state on camera button
+  const cameraBtn = document.querySelector('button[title="Ubah Foto"]');
+  if (cameraBtn) {
+    cameraBtn.disabled = true;
+    cameraBtn.innerHTML = `
+      <svg class='w-4 h-4 animate-spin' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'></path>
+      </svg>
+    `;
+  }
+
+  try {
+    await userAPI.uploadProfilePhoto(file);
+    showNotification('Foto profil berhasil diupload!', 'success');
+    
+    // Reload profile to show new photo
+    await loadProfile();
+    
+    // Clear file input
+    if (fileInput) fileInput.value = '';
+    
+  } catch (error) {
+    console.error('Error uploading profile photo:', error);
+    showNotification(
+      error.response?.data?.message || 'Gagal mengupload foto profil',
+      'error'
+    );
+  } finally {
+    // Reset camera button
+    if (cameraBtn) {
+      cameraBtn.disabled = false;
+      cameraBtn.innerHTML = `
+        <svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6v6m0 0v6m0-6h6m-6 0H6'></path>
+        </svg>
+      `;
+    }
+  }
+}
+
 
 function setupFormHandlers() {
   const form = document.getElementById('profile-form');
