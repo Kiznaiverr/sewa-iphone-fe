@@ -19,10 +19,19 @@ export function Navbar() {
           ${isAuth ? `
             <div class='flex items-center gap-3'>
               <div class='flex items-center gap-2 px-3 py-2 bg-neutral-50 rounded-lg border border-neutral-200'>
-                <div class='w-8 h-8 bg-primary-100 rounded-full flex-center'>
-                  <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
-                  </svg>
+                <div class='w-8 h-8 rounded-full overflow-hidden bg-neutral-200 flex-center' id='navbar-profile-photo'>
+                  ${user?.profile ? `
+                    <img src='${user.profile}' alt='Profile' class='w-full h-full object-cover' onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class='w-full h-full bg-primary-100 flex-center' style='display: none;'>
+                      <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
+                      </svg>
+                    </div>
+                  ` : `
+                    <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
+                    </svg>
+                  `}
                 </div>
                 <span class='text-sm font-medium text-neutral-700'>${user?.name || 'User'}</span>
               </div>
@@ -137,4 +146,28 @@ export function Sidebar() {
       </div>
     </aside>
   `;
+}
+
+export function updateNavbarProfilePhoto() {
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+  const profilePhotoContainer = document.getElementById('navbar-profile-photo');
+  
+  if (profilePhotoContainer && user) {
+    if (user.profile) {
+      profilePhotoContainer.innerHTML = `
+        <img src='${user.profile}' alt='Profile' class='w-full h-full object-cover' onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class='w-full h-full bg-primary-100 flex-center' style='display: none;'>
+          <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
+          </svg>
+        </div>
+      `;
+    } else {
+      profilePhotoContainer.innerHTML = `
+        <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
+        </svg>
+      `;
+    }
+  }
 }

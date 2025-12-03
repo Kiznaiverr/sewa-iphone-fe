@@ -1,4 +1,4 @@
-import { Navbar, Footer } from '../../components/layout/Layout.js';
+import { Navbar, Footer, updateNavbarProfilePhoto } from '../../components/layout/Layout.js';
 import { LoadingSpinner, ErrorMessage } from '../../components/common/Components.js';
 import { userAPI } from '../../js/api/endpoints.js';
 import { showNotification, isAuthenticated } from '../../js/utils/helpers.js';
@@ -133,6 +133,11 @@ async function loadProfile() {
     const response = await userAPI.getProfile();
     const profile = response.data.data;
 
+    // Update user data in localStorage with latest profile info
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const updatedUser = { ...currentUser, ...profile };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+
     // Check verification status and show alert if needed
     const verificationAlert = document.getElementById('verification-alert');
     if (!profile.isverified) {
@@ -160,6 +165,9 @@ async function loadProfile() {
     if (usernameElement && profile.username) {
       usernameElement.textContent = profile.username;
     }
+
+    // Update navbar profile photo
+    updateNavbarProfilePhoto();
 
     document.getElementById('profile-info').innerHTML = `
       <div class='space-y-6'>
@@ -274,6 +282,9 @@ async function uploadProfilePhoto(file) {
     
     // Reload profile to show new photo
     await loadProfile();
+    
+    // Update navbar profile photo
+    updateNavbarProfilePhoto();
     
     // Clear file input
     if (fileInput) fileInput.value = '';
