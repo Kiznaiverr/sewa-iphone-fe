@@ -23,10 +23,8 @@ export async function HomePage() {
                 <a href="/register" data-link class="btn btn-secondary-outline btn-lg">Daftar Sekarang</a>
               </div>
             </div>
-            <div class="h-96 bg-neutral-200 rounded-2xl flex-center">
-              <svg class="w-32 h-32 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-              </svg>
+            <div class="h-96 bg-neutral-200 rounded-2xl overflow-hidden">
+              <img src="/images/banner.jpeg" alt="iPhone Rental Service" class="w-full h-full object-cover">
             </div>
           </div>
         </div>
