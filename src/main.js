@@ -12,7 +12,7 @@ import { ProfilePage } from './pages/user/Profile.js';
 import { VerificationPage } from './pages/Verification.js';
 import { AdminDashboardPage, AdminIphonesPage, AdminCreateIphonePage, AdminOrdersPage, AdminRentalsPage, AdminUsersPage } from './pages/admin/AdminPages.js';
 import { AdminTestimonialsPage } from './pages/admin/AdminTestimonialsPage.js';
-import { showLogoutConfirmation, closeModal, confirmLogout, showOrderSuccessModal, confirmDelete } from './components/common/Components.js';
+import { showLogoutConfirmation, closeModal, confirmLogout, showOrderSuccessModal, confirmDelete } from './components/common/index.js';
 
 const router = new Router();
 

@@ -1,5 +1,5 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/common/index.js';
 import { userAPI } from '../js/api/endpoints.js';
 import { formatCurrency, formatDate, isAuthenticated } from '../js/utils/helpers.js';
 

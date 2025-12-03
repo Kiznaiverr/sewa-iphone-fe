@@ -1,5 +1,5 @@
 import { Navbar, Footer, updateNavbarProfilePhoto } from '../../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage } from '../../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage } from '../../components/common/index.js';
 import { userAPI } from '../../js/api/endpoints.js';
 import { showNotification, isAuthenticated } from '../../js/utils/helpers.js';
 

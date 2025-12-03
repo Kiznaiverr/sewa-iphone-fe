@@ -1,5 +1,5 @@
 import { Sidebar } from '../../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage, EmptyState, showAlertModal } from '../../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage, EmptyState, showAlertModal } from '../../components/common/index.js';
 import { adminAPI } from '../../js/api/endpoints.js';
 import { formatDate, isAdmin } from '../../js/utils/helpers.js';
 

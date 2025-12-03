@@ -1,5 +1,5 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage } from '../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage } from '../components/common/index.js';
 import { testimonialAPI } from '../js/api/endpoints.js';
 
 export async function HomePage() {

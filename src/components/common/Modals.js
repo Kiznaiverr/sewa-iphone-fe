@@ -1,62 +1,3 @@
-export function LoadingSpinner() {
-  return `
-    <div class="flex-center">
-      <div class="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
-    </div>
-  `;
-}
-
-export function LoadingCard() {
-  return `
-    <div class="card">
-      <div class="space-y-4">
-        <div class="h-8 bg-neutral-200 rounded animate-pulse"></div>
-        <div class="h-6 bg-neutral-200 rounded animate-pulse w-3/4"></div>
-        <div class="h-6 bg-neutral-200 rounded animate-pulse w-1/2"></div>
-      </div>
-    </div>
-  `;
-}
-
-export function EmptyState(title, message, actionText = null, actionLink = null) {
-  return `
-    <div class="flex flex-col items-center justify-center py-16">
-      <div class="w-20 h-20 bg-neutral-200 rounded-full flex-center mb-4">
-        <svg class="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-        </svg>
-      </div>
-      <h3 class="text-xl font-bold text-neutral-900 mb-2">${title}</h3>
-      <p class="text-neutral-500 text-center mb-6 max-w-sm">${message}</p>
-      ${actionText && actionLink ? `
-        <a href="${actionLink}" data-link class="btn btn-primary">${actionText}</a>
-      ` : ''}
-    </div>
-  `;
-}
-
-export function ErrorMessage(message, retry = null) {
-  return `
-    <div class="alert alert-error">
-      <div class="flex-between">
-        <div>
-          <h4 class="font-bold mb-1">Terjadi Kesalahan</h4>
-          <p>${message}</p>
-        </div>
-        ${retry ? `<button onclick="${retry}()" class="btn btn-sm btn-secondary">Coba Lagi</button>` : ''}
-      </div>
-    </div>
-  `;
-}
-
-export function SuccessMessage(message) {
-  return `
-    <div class="alert alert-success">
-      <p>${message}</p>
-    </div>
-  `;
-}
-
 export function Modal(title, content, footer = '') {
   return `
     <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex-center animate-modal-fade-in">
@@ -123,7 +64,6 @@ export function confirmLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
 
-
   // Close modal
   closeModal();
 
@@ -186,7 +126,7 @@ export function showAlertModal(message, isSuccess = false, onClose = null) {
       <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 animate-modal-slide-up">
         <div class="p-8 flex flex-col items-center gap-4">
           <div class="w-16 h-16 rounded-full flex-center ${isSuccess ? 'bg-success-100' : 'bg-error-100'} animate-bounce">
-            ${isSuccess 
+            ${isSuccess
               ? '<svg class="w-8 h-8 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>'
               : '<svg class="w-8 h-8 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
             }
@@ -294,4 +234,3 @@ export function showUserActionModal(title, message, onConfirm) {
     if (onConfirm) onConfirm();
   };
 }
-

@@ -1,5 +1,5 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
-import { LoadingSpinner, EmptyState, ErrorMessage } from '../components/common/Components.js';
+import { LoadingSpinner, EmptyState, ErrorMessage } from '../components/common/index.js';
 import { iphoneAPI } from '../js/api/endpoints.js';
 import { formatCurrency } from '../js/utils/helpers.js';
 

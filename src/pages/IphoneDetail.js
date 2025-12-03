@@ -1,5 +1,5 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage, showOrderSuccessModal } from '../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage, showOrderSuccessModal } from '../components/common/index.js';
 import { iphoneAPI, userAPI } from '../js/api/endpoints.js';
 import { formatCurrency, calculateDays, calculateTotalPrice, showNotification } from '../js/utils/helpers.js';
 

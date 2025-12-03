@@ -1,5 +1,5 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
-import { showAlertModal } from '../components/common/Components.js';
+import { showAlertModal } from '../components/common/index.js';
 import { authAPI } from '../js/api/endpoints.js';
 import { setAuthData, validateEmail, validatePhone, validateNIK, validatePassword } from '../js/utils/helpers.js';
 
