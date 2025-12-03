@@ -29,8 +29,8 @@ export async function AdminCreateIphonePage() {
               </div>
 
               <div class="mb-6">
-                <label class="block text-sm font-bold mb-2">Deskripsi</label>
-                <textarea name="description" required class="input w-full" rows="4" placeholder="Deskripsi produk"></textarea>
+                <label class="block text-sm font-bold mb-2">Spesifikasi</label>
+                <textarea name="specs" required class="input w-full" rows="4" placeholder="Spesifikasi produk"></textarea>
               </div>
 
               <div class="grid grid-cols-2 gap-6 mb-6">
@@ -46,15 +46,7 @@ export async function AdminCreateIphonePage() {
 
               <div class="mb-6">
                 <label class="block text-sm font-bold mb-2">Foto</label>
-                <input type="file" name="photo" accept="image/*" class="input w-full">
-              </div>
-
-              <div class="mb-6">
-                <label class="block text-sm font-bold mb-2">Status</label>
-                <select name="status" class="input w-full">
-                  <option value="active">Aktif</option>
-                  <option value="inactive">Tidak Aktif</option>
-                </select>
+                <input type="file" name="images" accept="image/*" class="input w-full">
               </div>
 
               <div class="flex gap-4">

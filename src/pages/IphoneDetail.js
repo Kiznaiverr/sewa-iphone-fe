@@ -32,9 +32,9 @@ async function loadIphoneDetail(id) {
     container.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <div class="w-full h-80 bg-neutral-200 rounded-xl mb-4 overflow-hidden">
+          <div class="w-full h-96 bg-neutral-200 rounded-xl mb-4 overflow-hidden flex items-center justify-center">
             ${images.length > 0 ? 
-              `<img src="${images[0]}" alt="${iphone.name}" class="w-full h-full object-cover">` : 
+              `<img src="${images[0]}" alt="${iphone.name}" class="max-w-full max-h-full object-contain">` : 
               '<div class="w-full h-full flex-center text-neutral-500">No Image</div>'}
           </div>
         </div>
