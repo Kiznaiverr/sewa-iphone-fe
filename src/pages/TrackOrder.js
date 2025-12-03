@@ -3,6 +3,14 @@ import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/common/C
 import { userAPI } from '../js/api/endpoints.js';
 import { formatCurrency, formatDate, isAuthenticated } from '../js/utils/helpers.js';
 
+function calculateDuration(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end - start);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
 export async function TrackOrderPage(code) {
   const app = document.getElementById('app');
 
@@ -47,12 +55,16 @@ async function loadTrackingData(code) {
     const container = document.getElementById('track-container');
     container.innerHTML = `
       <div class="card mb-6">
-        <h2 class="text-2xl font-bold mb-6">Rincian Pesanan</h2>
+        <h2 class="text-2xl font-bold mb-6">Informasi Pesanan</h2>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 pb-8 border-b border-neutral-200">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 pb-8 border-b border-neutral-200">
           <div>
             <p class="text-xs text-neutral-500 mb-1">Kode Pesanan</p>
             <p class="font-bold text-lg">${order.order_code}</p>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-500 mb-1">Model iPhone</p>
+            <p class="font-bold">${order.iphone_name || 'N/A'}</p>
           </div>
           <div>
             <p class="text-xs text-neutral-500 mb-1">Tanggal Mulai</p>
@@ -63,8 +75,20 @@ async function loadTrackingData(code) {
             <p class="font-bold">${formatDate(order.end_date)}</p>
           </div>
           <div>
+            <p class="text-xs text-neutral-500 mb-1">Durasi Sewa</p>
+            <p class="font-bold">${calculateDuration(order.start_date, order.end_date)} hari</p>
+          </div>
+          <div>
             <p class="text-xs text-neutral-500 mb-1">Total Harga</p>
             <p class="font-bold text-primary-600">${formatCurrency(order.total_price)}</p>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-500 mb-1">Tanggal Pesan</p>
+            <p class="font-bold">${formatDate(order.created_at || order.start_date)}</p>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-500 mb-1">Status</p>
+            <span class="badge badge-${order.status === 'pre_ordered' ? 'warning' : order.status === 'approved' ? 'info' : 'success'}">${order.status.replace('_', ' ')}</span>
           </div>
         </div>
 
@@ -97,28 +121,6 @@ async function loadTrackingData(code) {
               </div>
             `;
           }).join('')}
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 class="text-xl font-bold mb-4">Informasi Tambahan</h2>
-        <div class="space-y-3">
-          <div class="flex-between pb-3 border-b border-neutral-200">
-            <span class="text-neutral-600">ID Pesanan</span>
-            <span class="font-bold">#${order.id}</span>
-          </div>
-          <div class="flex-between pb-3 border-b border-neutral-200">
-            <span class="text-neutral-600">User ID</span>
-            <span class="font-bold">#${order.user_id}</span>
-          </div>
-          <div class="flex-between pb-3 border-b border-neutral-200">
-            <span class="text-neutral-600">iPhone ID</span>
-            <span class="font-bold">#${order.iphone_id}</span>
-          </div>
-          <div class="flex-between">
-            <span class="text-neutral-600">Status Saat Ini</span>
-            <span class="badge badge-${order.status === 'pre_ordered' ? 'warning' : 'success'}">${order.status}</span>
-          </div>
         </div>
       </div>
     `;

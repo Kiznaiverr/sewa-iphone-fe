@@ -1,5 +1,5 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
-import { LoadingSpinner, EmptyState, ErrorMessage } from '../components/common/Components.js';
+import { LoadingSpinner, ErrorMessage } from '../components/common/Components.js';
 import { testimonialAPI } from '../js/api/endpoints.js';
 
 export async function HomePage() {
@@ -68,7 +68,10 @@ export async function HomePage() {
       </section>
 
       <section class="container-main section">
-        <h2 class="text-3xl font-bold text-center mb-12">Testimoni Pelanggan</h2>
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold mb-4">Testimoni Pelanggan</h2>
+          <p class="text-neutral-600 mb-6">Apa kata pelanggan kami tentang pengalaman menggunakan layanan sewa iPhone</p>
+        </div>
         <div id="testimonials-container">
           <div class="grid-responsive">
             ${LoadingSpinner()}
@@ -86,29 +89,49 @@ async function loadTestimonials() {
   try {
     const response = await testimonialAPI.getAll();
     const allTestimonials = response.data.data;
-    const testimonials = allTestimonials.slice(0, 3);
+    const testimonials = allTestimonials.slice(0, 3); // Only show 3 testimonials
 
     if (!Array.isArray(testimonials) || testimonials.length === 0) {
-      document.getElementById('testimonials-container').innerHTML = EmptyState(
-        'Belum Ada Testimoni',
-        'Jadilah pelanggan pertama yang memberikan testimoni'
-      );
+      document.getElementById('testimonials-container').innerHTML = `
+        <div class="text-center py-12">
+          <div class="max-w-md mx-auto">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Belum Ada Testimoni</h3>
+            <p class="text-neutral-600 mb-6">Jadilah pelanggan pertama yang memberikan testimoni</p>
+            <a href="/testimonials" data-link class="btn btn-primary">Beri Testimoni</a>
+          </div>
+        </div>
+      `;
       return;
     }
 
     const container = document.getElementById('testimonials-container');
-    container.innerHTML = testimonials.map(testimonial => `
-      <div class="card">
-        <div class="flex gap-1 mb-4 items-center">
-          <div class="flex gap-1">
-            ${'<span class="text-warning text-lg">★</span>'.repeat(testimonial.rating)}
+    container.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        ${testimonials.map(testimonial => `
+          <div class="card">
+            <div class="flex gap-1 mb-4 items-center">
+              <div class="flex gap-1">
+                ${'<span class="text-warning text-lg">★</span>'.repeat(testimonial.rating)}
+              </div>
+              <span class="text-sm text-neutral-600">${testimonial.rating}/5</span>
+            </div>
+            <p class="text-neutral-600 mb-4 italic">"${testimonial.message}"</p>
+            <p class="font-bold text-sm">${testimonial.user_name || 'Pelanggan'}</p>
           </div>
-          <span class="text-sm text-neutral-600">${testimonial.rating}/5</span>
-        </div>
-        <p class="text-neutral-600 mb-4 italic">"${testimonial.message}"</p>
-        <p class="font-bold text-sm">${testimonial.user_name || 'Pelanggan'}</p>
+        `).join('')}
       </div>
-    `).join('');
+      <div class="text-center">
+        <a href="/testimonials" data-link class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white hover:bg-primary-700 rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md">
+          <i class="fas fa-plus-circle"></i>
+          <span>Beri Testimonimu Sendiri</span>
+        </a>
+      </div>
+    `;
   } catch (error) {
     console.error('Error loading testimonials:', error);
     document.getElementById('testimonials-container').innerHTML = `

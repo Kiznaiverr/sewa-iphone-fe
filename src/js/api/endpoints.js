@@ -24,6 +24,7 @@ export const iphoneAPI = {
 
 export const testimonialAPI = {
   getAll: () => apiClient.get('/api/testimonial'),
+  create: (data) => apiClient.post('/api/testimonial', data),
 };
 
 export const adminAPI = {

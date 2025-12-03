@@ -130,6 +130,7 @@ export function Sidebar() {
         <a href='/admin/orders' data-link class='block px-4 py-3 rounded-lg text-neutral-200 hover:bg-neutral-800 transition-colors'>Pesanan</a>
         <a href='/admin/rentals' data-link class='block px-4 py-3 rounded-lg text-neutral-200 hover:bg-neutral-800 transition-colors'>Rental</a>
         <a href='/admin/users' data-link class='block px-4 py-3 rounded-lg text-neutral-200 hover:bg-neutral-800 transition-colors'>Pengguna</a>
+        <a href='/admin/testimonials' data-link class='block px-4 py-3 rounded-lg text-neutral-200 hover:bg-neutral-800 transition-colors'>Testimoni</a>
       </nav>
       <div class='p-4 border-t border-neutral-700'>
         <button onclick='handleLogout()' class='w-full btn btn-sm btn-danger'>Keluar</button>

@@ -211,3 +211,47 @@ export function showAlertModal(message, isSuccess = false, onClose = null) {
   modalContainer.innerHTML = modal;
 }
 
+export function showDeleteModal(testimonialId) {
+  const modal = Modal(
+    'Konfirmasi Hapus Testimoni',
+    `
+      <div class="text-center">
+        <div class="w-16 h-16 bg-error bg-opacity-10 rounded-full flex-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </div>
+        <p class="text-neutral-600 mb-6">Apakah Anda yakin ingin menghapus testimoni ini? Tindakan ini tidak dapat dibatalkan.</p>
+      </div>
+    `,
+    `
+      <button onclick="closeModal()" class="px-4 py-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-all duration-200 font-medium transform hover:scale-105">
+        Batal
+      </button>
+      <button onclick="confirmDelete(${testimonialId})" class="px-4 py-2 bg-error text-white hover:bg-red-600 rounded-lg transition-all duration-200 font-medium transform hover:scale-105 shadow-md hover:shadow-lg">
+        Ya, Hapus
+      </button>
+    `
+  );
+
+  // Create modal container if it doesn't exist
+  let modalContainer = document.getElementById('modal-container');
+  if (!modalContainer) {
+    modalContainer = document.createElement('div');
+    modalContainer.id = 'modal-container';
+    document.body.appendChild(modalContainer);
+  }
+
+  modalContainer.innerHTML = modal;
+}
+
+export function confirmDelete(testimonialId) {
+  // Close modal
+  closeModal();
+
+  // Trigger the actual delete function
+  if (window.__deleteTestimonialCallback) {
+    window.__deleteTestimonialCallback(testimonialId);
+  }
+}
+

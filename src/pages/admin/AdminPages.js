@@ -8,6 +8,7 @@ export { AdminIphonesPage } from './AdminIphonesPage.js';
 export { AdminOrdersPage } from './AdminOrdersPage.js';
 export { AdminRentalsPage } from './AdminRentalsPage.js';
 export { AdminUsersPage } from './AdminUsersPage.js';
+export { AdminTestimonialsPage } from './AdminTestimonialsPage.js';
 export { AdminCreateIphonePage } from './AdminCreateIphonePage.js';
 
 export async function AdminDashboardPage() {

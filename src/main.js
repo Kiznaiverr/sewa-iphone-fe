@@ -11,7 +11,8 @@ import { TestimonialsPage } from './pages/Testimonials.js';
 import { ProfilePage } from './pages/user/Profile.js';
 import { VerificationPage } from './pages/Verification.js';
 import { AdminDashboardPage, AdminIphonesPage, AdminCreateIphonePage, AdminOrdersPage, AdminRentalsPage, AdminUsersPage } from './pages/admin/AdminPages.js';
-import { showLogoutConfirmation, closeModal, confirmLogout, showOrderSuccessModal } from './components/common/Components.js';
+import { AdminTestimonialsPage } from './pages/admin/AdminTestimonialsPage.js';
+import { showLogoutConfirmation, closeModal, confirmLogout, showOrderSuccessModal, confirmDelete } from './components/common/Components.js';
 
 const router = new Router();
 
@@ -110,6 +111,14 @@ router.register('/admin/users', () => {
   }
 });
 
+router.register('/admin/testimonials', () => {
+  if (!isAdmin()) {
+    window.location.href = '/';
+  } else {
+    AdminTestimonialsPage();
+  }
+});
+
 router.setNotFound(() => {
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -132,6 +141,7 @@ window.showLogoutConfirmation = showLogoutConfirmation;
 window.closeModal = closeModal;
 window.confirmLogout = confirmLogout;
 window.showOrderSuccessModal = showOrderSuccessModal;
+window.confirmDelete = confirmDelete;
 window.goToOrders = () => {
   window.location.href = '/orders';
 };
