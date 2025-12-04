@@ -65,9 +65,35 @@ export async function HomePage() {
               </div>
             </div>
             <div class="relative">
-              <div class="h-96 bg-gradient-to-br from-white to-neutral-100 rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
-                <img src="/images/banner.jpeg" alt="iPhone Rental Service" class="w-full h-full object-cover">
+              <!-- Slider Container -->
+              <div class="h-96 bg-gradient-to-br from-white to-neutral-100 rounded-3xl overflow-hidden shadow-2xl relative group">
+                <div id="slider-container" class="relative w-full h-full">
+                  <!-- Slides akan di-generate oleh JavaScript -->
+                  <div class="flex items-center justify-center h-full bg-neutral-200">
+                    <svg class="w-12 h-12 text-neutral-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <button id="slider-prev" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 z-10 transition-all duration-200 opacity-0 group-hover:opacity-100">
+                  <svg class="w-6 h-6 text-neutral-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <button id="slider-next" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full p-2 z-10 transition-all duration-200 opacity-0 group-hover:opacity-100">
+                  <svg class="w-6 h-6 text-neutral-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+
+                <!-- Dots Indicator -->
+                <div id="slider-dots" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+                  <!-- Dots akan di-generate oleh JavaScript -->
+                </div>
               </div>
+
               <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-4 transform hover:scale-105 transition-transform duration-300">
                 <div class="flex items-center gap-3">
                   <div class="w-12 h-12 bg-success-100 rounded-full flex-center">
@@ -209,6 +235,7 @@ export async function HomePage() {
   `;
 
   loadTestimonials();
+  initializeSlider();
 
   // Add scroll effect
   const observerOptions = {
@@ -284,6 +311,127 @@ async function loadTestimonials() {
     document.getElementById('testimonials-container').innerHTML = `
       <div class="col-span-full">
         ${ErrorMessage('Gagal memuat testimoni.')}
+      </div>
+    `;
+  }
+}
+
+async function initializeSlider() {
+  try {
+    const imageFiles = [
+      'banner.jpeg',
+      'banner2.jpg',
+      'banner3.jpg'
+      // Tambah gambar baru di sini, contoh:
+      // 'banner4.jpg',
+      // 'banner5.png',
+    ];
+
+    if (imageFiles.length === 0) {
+      console.warn('No images found in /images/ folder');
+      return;
+    }
+
+    // State untuk slider
+    let currentSlide = 0;
+    let autoPlayInterval;
+
+    // Get DOM elements
+    const sliderContainer = document.getElementById('slider-container');
+    const sliderPrev = document.getElementById('slider-prev');
+    const sliderNext = document.getElementById('slider-next');
+    const sliderDots = document.getElementById('slider-dots');
+
+    // Generate slides HTML
+    sliderContainer.innerHTML = imageFiles.map((image, index) => `
+      <div class="slider-slide absolute inset-0 transition-opacity duration-700 ease-in-out ${index === 0 ? 'opacity-100' : 'opacity-0'}" data-index="${index}">
+        <img src="/images/${image}" alt="Banner ${index + 1}" class="w-full h-full object-cover">
+      </div>
+    `).join('');
+
+    // Generate dots HTML
+    sliderDots.innerHTML = imageFiles.map((_, index) => `
+      <button class="slider-dot w-2 h-2 rounded-full bg-white transition-all duration-300 ${index === 0 ? 'bg-opacity-100 w-8' : 'bg-opacity-50 hover:bg-opacity-75'}" data-index="${index}" aria-label="Go to slide ${index + 1}"></button>
+    `).join('');
+
+    // Show slide function
+    const showSlide = (index) => {
+      // Normalize index
+      currentSlide = (index + imageFiles.length) % imageFiles.length;
+
+      // Update slides
+      document.querySelectorAll('.slider-slide').forEach(slide => {
+        const slideIndex = parseInt(slide.getAttribute('data-index'));
+        slide.classList.toggle('opacity-100', slideIndex === currentSlide);
+        slide.classList.toggle('opacity-0', slideIndex !== currentSlide);
+      });
+
+      // Update dots
+      document.querySelectorAll('.slider-dot').forEach(dot => {
+        const dotIndex = parseInt(dot.getAttribute('data-index'));
+        if (dotIndex === currentSlide) {
+          dot.classList.remove('w-2');
+          dot.classList.add('w-8', 'bg-opacity-100');
+        } else {
+          dot.classList.remove('w-8', 'bg-opacity-100');
+          dot.classList.add('w-2', 'bg-opacity-50');
+        }
+      });
+    };
+
+    // Start auto play function
+    const startAutoPlay = () => {
+      autoPlayInterval = setInterval(() => {
+        showSlide(currentSlide + 1);
+      }, 5000); // Change slide setiap 5 detik
+    };
+
+    // Stop auto play function
+    const stopAutoPlay = () => {
+      clearInterval(autoPlayInterval);
+    };
+
+    // Event listeners untuk buttons
+    sliderPrev.addEventListener('click', () => {
+      stopAutoPlay();
+      showSlide(currentSlide - 1);
+      startAutoPlay();
+    });
+
+    sliderNext.addEventListener('click', () => {
+      stopAutoPlay();
+      showSlide(currentSlide + 1);
+      startAutoPlay();
+    });
+
+    // Event listeners untuk dots
+    document.querySelectorAll('.slider-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        stopAutoPlay();
+        showSlide(parseInt(dot.getAttribute('data-index')));
+        startAutoPlay();
+      });
+    });
+
+    // Pause autoplay saat hover
+    sliderContainer.addEventListener('mouseenter', stopAutoPlay);
+    sliderContainer.addEventListener('mouseleave', startAutoPlay);
+
+    // Start autoplay
+    startAutoPlay();
+
+  } catch (error) {
+    console.error('Error loading slider images:', error);
+    // Fallback jika fetch error
+    const sliderContainer = document.getElementById('slider-container');
+    sliderContainer.innerHTML = `
+      <div class="flex items-center justify-center h-full bg-gradient-to-br from-primary-300 to-secondary-300">
+        <div class="text-center">
+          <svg class="w-16 h-16 text-white mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <p class="text-white opacity-75">Banner images loading...</p>
+        </div>
       </div>
     `;
   }
