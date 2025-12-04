@@ -1,9 +1,11 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
 import { LoadingSpinner, ErrorMessage } from '../components/common/index.js';
 import { testimonialAPI } from '../js/api/endpoints.js';
+import { isAuthenticated } from '../js/utils/helpers.js';
 
 export async function HomePage() {
   const app = document.getElementById('app');
+  const isLoggedIn = isAuthenticated();
 
   app.innerHTML = `
     ${Navbar()}
@@ -20,7 +22,7 @@ export async function HomePage() {
               </p>
               <div class="flex gap-4">
                 <a href="/iphones" data-link class="btn btn-primary btn-lg">Lihat Produk</a>
-                <a href="/register" data-link class="btn btn-secondary-outline btn-lg">Daftar Sekarang</a>
+                ${!isLoggedIn ? '<a href="/register" data-link class="btn btn-secondary-outline btn-lg">Daftar Sekarang</a>' : ''}
               </div>
             </div>
             <div class="h-96 bg-neutral-200 rounded-2xl overflow-hidden">
