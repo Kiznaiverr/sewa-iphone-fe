@@ -1,7 +1,7 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
 import { showAlertModal } from '../components/common/index.js';
 import { authAPI } from '../js/api/endpoints.js';
-import { setAuthData, validateEmail, validatePhone, validateNIK, validatePassword } from '../js/utils/helpers.js';
+import { setAuthData, validateEmail, validatePhone, validateNIK, validatePassword, validateUsername } from '../js/utils/helpers.js';
 
 export function LoginPage() {
   const app = document.getElementById('app');
@@ -313,10 +313,15 @@ async function handleRegister(e) {
   const name = document.getElementById('name').value;
   const username = document.getElementById('username').value;
   const email = document.getElementById('email').value;
-  const phone = document.getElementById('phone').value;
-  const nik = document.getElementById('nik').value;
+  let phone = document.getElementById('phone').value;
+  let nik = document.getElementById('nik').value;
   const password = document.getElementById('password').value;
   const confirmPassword = document.getElementById('confirm-password').value;
+
+  if (!validateUsername(username)) {
+    showAlertModal('Username harus 3-20 karakter, hanya huruf, angka, dan underscore', false);
+    return;
+  }
 
   if (password !== confirmPassword) {
     showAlertModal('Password tidak cocok', false);
@@ -333,10 +338,20 @@ async function handleRegister(e) {
     return;
   }
 
+  // Normalize phone number to +62 format
+  if (phone.startsWith('0')) {
+    phone = '+62' + phone.substring(1);
+  } else if (phone.startsWith('62')) {
+    phone = '+' + phone;
+  }
+
   if (!validateNIK(nik)) {
     showAlertModal('NIK harus 16 digit', false);
     return;
   }
+
+  // Ensure NIK is clean digits only
+  nik = nik.replace(/\D/g, '');
 
   if (email && !validateEmail(email)) {
     showAlertModal('Format email tidak valid', false);
@@ -344,14 +359,16 @@ async function handleRegister(e) {
   }
 
   try {
-    const response = await authAPI.register({
+    const registerData = {
       name,
       username,
-      email: email || undefined,
+      email: email || '',
       phone,
       nik,
       password,
-    });
+    };
+
+    const response = await authAPI.register(registerData);
 
     if (response.data.success) {
       showAlertModal('Pendaftaran berhasil. Silakan login', true);
@@ -360,7 +377,29 @@ async function handleRegister(e) {
       }, 1500);
     }
   } catch (error) {
-    const message = error.response?.data?.message || 'Pendaftaran gagal. Silakan coba lagi';
+    let message = 'Pendaftaran gagal. Silakan coba lagi';
+
+    if (error.response?.status === 500) {
+      // Jika server error tapi data mungkin sudah masuk, beri pesan khusus
+      message = 'Terjadi kesalahan server. Silakan coba login dengan akun yang baru didaftarkan.';
+    } else if (error.response?.status === 400 && error.response?.data?.message) {
+      const errorMessage = error.response.data.message.toLowerCase();
+
+      if (errorMessage.includes('username') && errorMessage.includes('sudah')) {
+        message = 'Username sudah digunakan. Silakan pilih username lain.';
+      } else if (errorMessage.includes('email') && errorMessage.includes('sudah')) {
+        message = 'Email sudah terdaftar. Silakan gunakan email lain.';
+      } else if (errorMessage.includes('phone') && errorMessage.includes('sudah')) {
+        message = 'Nomor telepon sudah terdaftar. Silakan gunakan nomor lain.';
+      } else if (errorMessage.includes('nik') && errorMessage.includes('sudah')) {
+        message = 'NIK sudah terdaftar. Silakan gunakan NIK lain.';
+      } else {
+        message = error.response.data.message;
+      }
+    } else if (error.response?.data?.message) {
+      message = error.response.data.message;
+    }
+
     showAlertModal(message, false);
   }
 }

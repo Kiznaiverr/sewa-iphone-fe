@@ -3,7 +3,7 @@ export function Navbar() {
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
   return `
-    <nav class='bg-white border-b border-neutral-200 sticky top-0 z-40 shadow-sm'>
+    <nav class='bg-white/95 backdrop-blur-md border-b border-neutral-200/50 sticky top-0 z-40 shadow-lg shadow-neutral-900/5'>
       <div class='container-main flex-between'>
         <div class='flex items-center gap-8'>
           <a href='/' data-link class='text-2xl font-bold text-primary-600'>
