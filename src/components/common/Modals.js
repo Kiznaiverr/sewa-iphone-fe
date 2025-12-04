@@ -68,7 +68,8 @@ export function confirmLogout() {
   closeModal();
 
   // Redirect to home
-  window.location.href = '/';
+  const router = window.__router;
+  router.navigate('/');
 }
 
 export function showOrderSuccessModal() {
@@ -104,7 +105,8 @@ export function showOrderSuccessModal() {
 
   // Auto redirect after 3 seconds
   setTimeout(() => {
-    window.location.href = '/orders';
+    const router = window.__router;
+    router.navigate('/orders');
   }, 3000);
 }
 

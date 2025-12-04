@@ -73,7 +73,8 @@ async function handleCreateIphone(e) {
     await adminAPI.iphones.create(formData);
     showAlertModal('iPhone berhasil ditambahkan!', true);
     setTimeout(() => {
-      window.location.href = '/admin/iphones';
+      const router = window.__router;
+      router.navigate('/admin/iphones');
     }, 2000);
   } catch (error) {
     console.error('Error creating iPhone:', error);

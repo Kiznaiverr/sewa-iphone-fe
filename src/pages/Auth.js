@@ -109,11 +109,12 @@ async function handleLogin(e) {
       const { token, user } = response.data.data;
       setAuthData(token, user);
 
-      // Redirect langsung tanpa notification
+      // Redirect menggunakan router untuk client-side navigation
+      const router = window.__router;
       if (user.role === 'admin') {
-        window.location.href = '/admin';
+        router.navigate('/admin');
       } else {
-        window.location.href = '/profile';
+        router.navigate('/profile');
       }
     }
   } catch (error) {
@@ -373,7 +374,8 @@ async function handleRegister(e) {
     if (response.data.success) {
       showAlertModal('Pendaftaran berhasil. Silakan login', true);
       setTimeout(() => {
-        window.location.href = '/login';
+        const router = window.__router;
+        router.navigate('/login');
       }, 1500);
     }
   } catch (error) {

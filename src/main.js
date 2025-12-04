@@ -41,7 +41,7 @@ router.register('/register', RegisterPage);
 
 router.register('/orders', () => {
   if (!isAuthenticated()) {
-    window.location.href = '/login';
+    router.navigate('/login');
   } else {
     OrdersPage();
   }
@@ -49,7 +49,7 @@ router.register('/orders', () => {
 
 router.register('/profile', () => {
   if (!isAuthenticated()) {
-    window.location.href = '/login';
+    router.navigate('/login');
   } else {
     ProfilePage();
   }
@@ -57,7 +57,7 @@ router.register('/profile', () => {
 
 router.register('/verify', () => {
   if (!isAuthenticated()) {
-    window.location.href = '/login';
+    router.navigate('/login');
   } else {
     VerificationPage();
   }
@@ -65,7 +65,7 @@ router.register('/verify', () => {
 
 router.register('/admin', () => {
   if (!isAdmin()) {
-    window.location.href = '/';
+    router.navigate('/');
   } else {
     AdminDashboardPage();
   }
@@ -73,7 +73,7 @@ router.register('/admin', () => {
 
 router.register('/admin/iphones', () => {
   if (!isAdmin()) {
-    window.location.href = '/';
+    router.navigate('/');
   } else {
     AdminIphonesPage();
   }
@@ -81,7 +81,7 @@ router.register('/admin/iphones', () => {
 
 router.register('/admin/iphones/create', () => {
   if (!isAdmin()) {
-    window.location.href = '/';
+    router.navigate('/');
   } else {
     AdminCreateIphonePage();
   }
@@ -89,7 +89,7 @@ router.register('/admin/iphones/create', () => {
 
 router.register('/admin/orders', () => {
   if (!isAdmin()) {
-    window.location.href = '/';
+    router.navigate('/');
   } else {
     AdminOrdersPage();
   }
@@ -97,7 +97,7 @@ router.register('/admin/orders', () => {
 
 router.register('/admin/rentals', () => {
   if (!isAdmin()) {
-    window.location.href = '/';
+    router.navigate('/');
   } else {
     AdminRentalsPage();
   }
@@ -105,7 +105,7 @@ router.register('/admin/rentals', () => {
 
 router.register('/admin/users', () => {
   if (!isAdmin()) {
-    window.location.href = '/';
+    router.navigate('/');
   } else {
     AdminUsersPage();
   }
@@ -113,7 +113,7 @@ router.register('/admin/users', () => {
 
 router.register('/admin/testimonials', () => {
   if (!isAdmin()) {
-    window.location.href = '/';
+    router.navigate('/');
   } else {
     AdminTestimonialsPage();
   }
@@ -143,7 +143,7 @@ window.confirmLogout = confirmLogout;
 window.showOrderSuccessModal = showOrderSuccessModal;
 window.confirmDelete = confirmDelete;
 window.goToOrders = () => {
-  window.location.href = '/orders';
+  router.navigate('/orders');
 };
 
 router.init();
