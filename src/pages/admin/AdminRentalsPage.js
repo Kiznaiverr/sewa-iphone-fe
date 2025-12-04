@@ -74,7 +74,7 @@ async function loadAdminRentals() {
           </div>
           <p class="text-sm text-neutral-600">iPhone: ${rental.iphone_name || 'N/A'}</p>
           <p class="text-sm text-neutral-600">Pengguna: ${rental.user_name || 'N/A'}</p>
-          <p class="text-sm text-neutral-600">Periode: ${formatDate(rental.start_date)} - ${formatDate(rental.end_date)}</p>
+          <p class="text-sm text-neutral-600">Periode: ${formatDate(rental.rental_start_date)} - ${formatDate(rental.rental_end_date)}</p>
           <button onclick="returnRental(${rental.id})" class="btn btn-sm btn-primary mt-2">Proses Return</button>
         </div>
       `).join('') : '<p class="text-neutral-500">Tidak ada rental aktif yang sesuai</p>';
@@ -87,7 +87,7 @@ async function loadAdminRentals() {
           </div>
           <p class="text-sm text-neutral-600">iPhone: ${rental.iphone_name || 'N/A'}</p>
           <p class="text-sm text-neutral-600">Pengguna: ${rental.user_name || 'N/A'}</p>
-          <p class="text-sm text-neutral-600">Jatuh Tempo: ${formatDate(rental.end_date)}</p>
+          <p class="text-sm text-neutral-600">Jatuh Tempo: ${formatDate(rental.rental_end_date)}</p>
           <button onclick="returnRental(${rental.id})" class="btn btn-sm btn-danger mt-2">Selesaikan Overdue</button>
         </div>
       `).join('') : '<p class="text-neutral-500">Tidak ada rental overdue yang sesuai</p>';

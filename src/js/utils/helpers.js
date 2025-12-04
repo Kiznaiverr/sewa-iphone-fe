@@ -30,11 +30,23 @@ export const formatCurrency = (value) => {
 };
 
 export const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('id-ID', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  if (!dateString) return 'Tanggal tidak tersedia';
+
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Format tanggal tidak valid';
+    }
+
+    return date.toLocaleDateString('id-ID', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    console.error('Error formatting date:', dateString, error);
+    return 'Error format tanggal';
+  }
 };
 
 export const formatDateAndTime = (dateString) => {
