@@ -14,5 +14,6 @@ export {
   showAlertModal,
   showDeleteModal,
   confirmDelete,
-  showUserActionModal
+  showUserActionModal,
+  showNotification
 } from './Modals.js';

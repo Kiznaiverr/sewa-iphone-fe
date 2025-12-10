@@ -1,11 +1,14 @@
 import apiClient from './client.js';
+import { RegisterRequest, LoginRequest, VerifyCodeRequest, UpdateUserRequest, OrderRequest, CreateTestimonialRequest, CreateIPhoneRequest, UpdateIPhoneRequest, AddStockRequest, UpdateOrderStatusRequest, ForgotPasswordRequest, ResetPasswordRequest } from '../../types';
 
 export const authAPI = {
-  register: (data) => apiClient.post('/api/auth/register', data),
-  login: (credentials) => apiClient.post('/api/auth/login', credentials),
+  register: (data: RegisterRequest) => apiClient.post('/api/auth/register', data),
+  login: (credentials: LoginRequest) => apiClient.post('/api/auth/login', credentials),
   logout: () => apiClient.post('/api/auth/logout'),
   sendVerificationCode: () => apiClient.post('/api/auth/send-verification-code'),
-  verifyCode: (code) => apiClient.post('/api/auth/verify-code', { code }),
+  verifyCode: (code: VerifyCodeRequest) => apiClient.post('/api/auth/verify-code', code),
+  forgotPassword: (data: ForgotPasswordRequest) => apiClient.post('/api/auth/forgot-password', data),
+  resetPassword: (data: ResetPasswordRequest) => apiClient.post('/api/auth/reset-password', data),
 };
 
 export const userAPI = {

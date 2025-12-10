@@ -64,8 +64,13 @@ export function LoginPage() {
           </form>
 
           <div class="mt-8 pt-6 border-t border-neutral-200">
+            <div class="text-center mb-4">
+              <a href="/forgot-password" data-link class="text-primary-600 hover:text-primary-700 font-medium hover:underline">
+                Lupa Password?
+              </a>
+            </div>
             <p class="text-center text-neutral-600 text-sm">
-              Belum punya akun? 
+              Belum punya akun?
               <a href="/register" data-link class="text-primary-600 font-bold hover:underline">Daftar di sini</a>
             </p>
           </div>

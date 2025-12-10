@@ -10,6 +10,8 @@ import { TrackOrderPage } from './pages/TrackOrder.js';
 import { TestimonialsPage } from './pages/Testimonials.js';
 import { ProfilePage } from './pages/user/Profile.js';
 import { VerificationPage } from './pages/Verification.js';
+import { ForgotPasswordPage } from './pages/ForgotPassword.js';
+import { ResetPasswordPage } from './pages/ResetPassword.js';
 import { AdminDashboardPage, AdminIphonesPage, AdminCreateIphonePage, AdminOrdersPage, AdminRentalsPage, AdminUsersPage } from './pages/admin/AdminPages.js';
 import { AdminTestimonialsPage } from './pages/admin/AdminTestimonialsPage.js';
 import { showLogoutConfirmation, closeModal, confirmLogout, showOrderSuccessModal, confirmDelete } from './components/common/index.js';
@@ -38,6 +40,8 @@ router.register('/iphones', IphonesPage);
 router.register('/testimonials', TestimonialsPage);
 router.register('/login', LoginPage);
 router.register('/register', RegisterPage);
+router.register('/forgot-password', ForgotPasswordPage);
+router.register('/reset-password', ResetPasswordPage);
 
 router.register('/orders', () => {
   if (!isAuthenticated()) {

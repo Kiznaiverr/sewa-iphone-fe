@@ -236,3 +236,74 @@ export function showUserActionModal(title, message, onConfirm) {
     if (onConfirm) onConfirm();
   };
 }
+
+export function showNotification(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+  // Create notification container if it doesn't exist
+  let notificationContainer = document.getElementById('notification-container');
+  if (!notificationContainer) {
+    notificationContainer = document.createElement('div');
+    notificationContainer.id = 'notification-container';
+    notificationContainer.className = 'fixed top-4 right-4 z-50 space-y-2';
+    document.body.appendChild(notificationContainer);
+  }
+
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `max-w-sm w-full p-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+
+  // Set colors based on type
+  const colors = {
+    success: 'bg-green-500 text-white',
+    error: 'bg-red-500 text-white',
+    info: 'bg-blue-500 text-white'
+  };
+
+  notification.classList.add(...colors[type].split(' '));
+
+  // Add icon based on type
+  const icons = {
+    success: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>`,
+    error: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>`,
+    info: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>`
+  };
+
+  notification.innerHTML = `
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        ${icons[type]}
+      </div>
+      <div class="ml-3 text-sm font-medium">
+        ${message}
+      </div>
+      <button class="ml-auto flex-shrink-0 text-white hover:text-gray-200 focus:outline-none" onclick="this.parentElement.parentElement.remove()">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  `;
+
+  // Add to container
+  notificationContainer.appendChild(notification);
+
+  // Animate in
+  setTimeout(() => {
+    notification.classList.remove('translate-x-full');
+  }, 10);
+
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    notification.classList.add('translate-x-full');
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, 300);
+  }, 5000);
+}
