@@ -295,7 +295,16 @@ async function loadTestimonials() {
               <span class="text-sm text-neutral-600">${testimonial.rating}/5</span>
             </div>
             <p class="text-neutral-600 mb-4 italic">"${testimonial.message}"</p>
-            <p class="font-bold text-sm">${testimonial.user_name || 'Pelanggan'}</p>
+            <div class="flex items-center gap-3">
+              <img src="${testimonial.profile || 'https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'}" 
+                   alt="Profile" 
+                   class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                   onerror="this.src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'">
+              <div>
+                <p class="font-bold text-sm">${testimonial.user_name || 'Pelanggan'}</p>
+                <p class="text-xs text-neutral-500">Diposting: ${new Date(testimonial.created_at).toLocaleDateString('id-ID')}</p>
+              </div>
+            </div>
           </div>
         `).join('')}
       </div>

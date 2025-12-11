@@ -84,6 +84,7 @@ async function loadAdminUsers(status = 'active') {
         <table class="w-full">
           <thead class="bg-neutral-100 border-b border-neutral-200">
             <tr>
+              <th class="px-6 py-3 text-left text-sm font-bold">Foto</th>
               <th class="px-6 py-3 text-left text-sm font-bold">Nama</th>
               <th class="px-6 py-3 text-left text-sm font-bold">Email</th>
               <th class="px-6 py-3 text-left text-sm font-bold">No. Telepon</th>
@@ -94,6 +95,12 @@ async function loadAdminUsers(status = 'active') {
           <tbody>
             ${items.map(user => `
               <tr class="border-b border-neutral-200 hover:bg-neutral-50">
+                <td class="px-6 py-3">
+                  <img src="${user.profile || 'https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'}" 
+                       alt="Profile" 
+                       class="w-10 h-10 rounded-full object-cover border border-neutral-200"
+                       onerror="this.src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'">
+                </td>
                 <td class="px-6 py-3">${user.name || 'N/A'}</td>
                 <td class="px-6 py-3">${user.email || 'N/A'}</td>
                 <td class="px-6 py-3">${user.phone || 'N/A'}</td>

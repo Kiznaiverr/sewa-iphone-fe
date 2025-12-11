@@ -75,8 +75,16 @@ async function loadAdminTestimonials() {
             ${items.map(testimonial => `
               <tr class="border-b border-neutral-200 hover:bg-neutral-50">
                 <td class="px-6 py-3">
-                  <div class="font-medium">${testimonial.user_name || 'N/A'}</div>
-                  <div class="text-xs text-neutral-500">ID: ${testimonial.user_id}</div>
+                  <div class="flex items-center gap-3">
+                    <img src="${testimonial.profile || 'https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'}" 
+                         alt="Profile" 
+                         class="w-8 h-8 rounded-full object-cover border border-neutral-200"
+                         onerror="this.src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'">
+                    <div>
+                      <div class="font-medium">${testimonial.user_name || 'N/A'}</div>
+                      <div class="text-xs text-neutral-500">ID: ${testimonial.user_id}</div>
+                    </div>
+                  </div>
                 </td>
                 <td class="px-6 py-3">
                   <div class="flex items-center gap-1">

@@ -95,7 +95,13 @@ async function loadAdminRentals() {
             </div>
             <div>
               <p class="text-sm font-medium text-neutral-700">Pengguna</p>
-              <p class="text-sm text-neutral-600">${rental.user_name || 'N/A'}</p>
+              <div class="flex items-center gap-2">
+                <img src="${rental.profile || 'https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'}" 
+                     alt="Profile" 
+                     class="w-6 h-6 rounded-full object-cover border border-neutral-200"
+                     onerror="this.src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'">
+                <p class="text-sm text-neutral-600">${rental.user_name || 'N/A'}</p>
+              </div>
             </div>
             <div>
               <p class="text-sm font-medium text-neutral-700">Jatuh Tempo</p>
@@ -189,8 +195,16 @@ async function loadAdminRentals() {
             <h3 class="text-lg font-semibold mb-3 text-neutral-900">Informasi Pengguna</h3>
             <div class="grid grid-cols-1 gap-3">
               <div class="bg-blue-50 p-3 rounded-lg">
-                <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">Nama</p>
-                <p class="text-sm font-semibold text-neutral-900">${rental.user_name || 'N/A'}</p>
+                <div class="flex items-center gap-3 mb-2">
+                  <img src="${rental.profile || 'https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'}" 
+                       alt="Profile" 
+                       class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                       onerror="this.src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg'">
+                  <div>
+                    <p class="text-sm font-medium text-blue-600 uppercase tracking-wide">Nama</p>
+                    <p class="text-base font-semibold text-neutral-900">${rental.user_name || 'N/A'}</p>
+                  </div>
+                </div>
               </div>
               <div class="bg-blue-50 p-3 rounded-lg">
                 <p class="text-xs font-medium text-blue-600 uppercase tracking-wide">Email</p>

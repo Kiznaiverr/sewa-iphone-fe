@@ -23,14 +23,10 @@ export function Navbar() {
                   ${user?.profile ? `
                     <img src='${user.profile}' alt='Profile' class='w-full h-full object-cover' onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <div class='w-full h-full bg-primary-100 flex-center' style='display: none;'>
-                      <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
-                      </svg>
+                      <img src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg' alt='Default Profile' class='w-full h-full object-cover rounded-full'>
                     </div>
                   ` : `
-                    <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
-                    </svg>
+                    <img src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg' alt='Default Profile' class='w-full h-full object-cover rounded-full'>
                   `}
                 </div>
                 <span class='text-sm font-medium text-neutral-700'>${user?.name || 'User'}</span>
@@ -157,16 +153,12 @@ export function updateNavbarProfilePhoto() {
       profilePhotoContainer.innerHTML = `
         <img src='${user.profile}' alt='Profile' class='w-full h-full object-cover' onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
         <div class='w-full h-full bg-primary-100 flex-center' style='display: none;'>
-          <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
-          </svg>
+          <img src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg' alt='Default Profile' class='w-full h-full object-cover rounded-full'>
         </div>
       `;
     } else {
       profilePhotoContainer.innerHTML = `
-        <svg class='w-4 h-4 text-primary-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'></path>
-        </svg>
+        <img src='https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg' alt='Default Profile' class='w-full h-full object-cover rounded-full'>
       `;
     }
   }
