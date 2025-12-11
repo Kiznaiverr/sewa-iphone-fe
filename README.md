@@ -1,6 +1,16 @@
+<div align="center">
+
 # Sewa iPhone Frontend
 
-Platform penyewaan iPhone modern dengan teknologi terbaru.
+**Platform penyewaan iPhone modern dengan teknologi terbaru**
+
+</div>
+
+> [!IMPORTANT]
+> Project ini hanya untuk tugas kuliah dan bukan aplikasi sesungguhnya yang digunakan untuk bisnis komersial.
+> Semua fitur, data, dan fungsi dalam aplikasi hanyalah demonstrasi/simulasi untuk keperluan akademik.
+
+---
 
 ## Fitur Utama
 
@@ -31,15 +41,32 @@ Platform penyewaan iPhone modern dengan teknologi terbaru.
   - Responsive design untuk semua device
   - Loading states dan error handling
 
+---
+
 ## Tech Stack
 
-- **Frontend Framework**: Vanilla JavaScript (ES6+)
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vite
-- **HTTP Client**: Axios
-- **Package Manager**: npm
+<div align="center">
+
+| Category | Technology |
+|----------|------------|
+| ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) | **Language** |
+| ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white) | **Type Safety** |
+| ![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=for-the-badge&logo=vite&logoColor=white) | **Build Tool** |
+| ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.0-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white) | **Styling** |
+| ![Axios](https://img.shields.io/badge/Axios-1.6-5A29E4?style=for-the-badge&logo=axios&logoColor=white) | **HTTP Client** |
+
+</div>
+
+---
 
 ## Setup
+
+### Prerequisites
+
+- Node.js v18+ dan npm v9+
+- Git
+
+### Installation
 
 ### 1. Clone Repository
 ```bash
@@ -78,6 +105,8 @@ npm run build
 
 Output akan berada di folder `dist/`
 
+---
+
 ## Project Structure
 
 ```
@@ -112,6 +141,8 @@ sewa-iphone-fe/
 └── .env.example
 ```
 
+---
+
 ## API Integration
 
 ### Authentication
@@ -138,12 +169,16 @@ sewa-iphone-fe/
 - Manage Orders: Update status
 - Manage Rentals: Track dan manage
 
+---
+
 ## Authentication Flow
 
 1. User register/login
 2. JWT token disimpan di localStorage
 3. Token otomatis ditambahkan ke setiap request header
 4. Token expired → auto logout dan redirect ke login
+
+---
 
 ## Development Guidelines
 
@@ -162,6 +197,8 @@ sewa-iphone-fe/
 - Try-catch untuk API calls
 - Show user-friendly messages
 - Log errors untuk debugging
+
+---
 
 ## Deployment
 
@@ -182,6 +219,8 @@ npm install -g vercel
 vercel --prod
 ```
 
+---
+
 ## Browser Support
 
 - Chrome (latest)
@@ -189,33 +228,16 @@ vercel --prod
 - Safari (latest)
 - Edge (latest)
 
-## Troubleshooting
-
-### CORS Issues
-- Update `vite.config.js` proxy untuk development
-- Backend harus mengizinkan CORS
-
-### API Not Responding
-- Cek VITE_API_BASE_URL di .env
-- Pastikan backend running
-- Cek network tab di DevTools
-
-### Build Fails
-- Delete `node_modules` dan `dist`
-- Run `npm install` kembali
-- Try `npm run build`
-
-## Kontribusi
-
-1. Create feature branch: `git checkout -b feature/nama-fitur`
-2. Commit changes: `git commit -m 'Add feature'`
-3. Push to branch: `git push origin feature/nama-fitur`
-4. Open Pull Request
+---
 
 ## License
 
-MIT License - lihat LICENSE file untuk detail
+MIT License - lihat [LICENSE](LICENSE) file untuk detail
 
-## Support
+---
 
-Untuk bantuan dan pertanyaan, hubungi developer atau buat issue di repository.
+<div align="center">
+
+**Made for Academic Purposes**
+
+</div>
