@@ -31,6 +31,19 @@ export async function ProfilePage() {
             </div>
           </div>
 
+          <!-- Penalty Warning -->
+          <div id='penalty-warning' class='hidden mb-6'>
+            <div class='alert alert-error'>
+              <div class='flex-between items-start'>
+                <div class='flex-1'>
+                  <h4 class='font-bold mb-1'>Pemberitahuan Denda</h4>
+                  <p id='penalty-message'></p>
+                </div>
+                <a href='/rentals' data-link class='btn btn-sm btn-error whitespace-nowrap ml-4'>Lihat Detail</a>
+              </div>
+            </div>
+          </div>
+
           <div class='grid grid-cols-1 lg:grid-cols-3 gap-6'>
             <!-- Profile Info & Photo -->
             <div class='lg:col-span-2'>
@@ -223,6 +236,16 @@ async function loadProfile() {
       verificationAlert.classList.remove('hidden');
     } else {
       verificationAlert.classList.add('hidden');
+    }
+
+    // Check penalty status and show warning if needed
+    const penaltyWarning = document.getElementById('penalty-warning');
+    const penaltyMessage = document.getElementById('penalty-message');
+    if (profile.penalty_info?.has_penalty) {
+      penaltyWarning.classList.remove('hidden');
+      penaltyMessage.textContent = profile.penalty_info.warning;
+    } else {
+      penaltyWarning.classList.add('hidden');
     }
 
     // Update profile photo

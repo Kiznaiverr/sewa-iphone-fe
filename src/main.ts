@@ -9,6 +9,7 @@ import { OrdersPage } from './pages/Orders.js';
 import { TrackOrderPage } from './pages/TrackOrder.js';
 import { TestimonialsPage } from './pages/Testimonials.js';
 import { ProfilePage } from './pages/user/Profile.js';
+import { RentalsPage } from './pages/user/Rentals.js';
 import { VerificationPage } from './pages/Verification.js';
 import { ForgotPasswordPage } from './pages/ForgotPassword.js';
 import { ResetPasswordPage } from './pages/ResetPassword.js';
@@ -56,6 +57,14 @@ router.register('/profile', () => {
     router.navigate('/login');
   } else {
     ProfilePage();
+  }
+});
+
+router.register('/rentals', () => {
+  if (!isAuthenticated()) {
+    router.navigate('/login');
+  } else {
+    RentalsPage();
   }
 });
 

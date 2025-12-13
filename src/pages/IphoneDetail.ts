@@ -139,7 +139,18 @@ async function loadIphoneDetail(id) {
 
           showOrderSuccessModal();
         } catch (error) {
-          showNotification('Gagal membuat pesanan: ' + error.response?.data?.message, 'error');
+          const errorMessage = error.response?.data?.message || 'Gagal membuat pesanan';
+          
+          // Check if error is related to overdue rentals/penalty
+          if (errorMessage.includes('overdue') || errorMessage.includes('penalty') || errorMessage.includes('outstanding penalties')) {
+            showNotification('Anda memiliki penyewaan yang terlambat. Silakan selesaikan denda terlebih dahulu.', 'error');
+            setTimeout(() => {
+              window.location.href = '/rentals';
+            }, 2000);
+            return;
+          }
+          
+          showNotification(errorMessage, 'error');
         }
       };
     }

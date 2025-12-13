@@ -13,6 +13,7 @@ export function Navbar() {
             <a href='/iphones' data-link class='text-neutral-600 hover:text-primary-600 transition-colors'>Produk</a>
             <a href='/testimonials' data-link class='text-neutral-600 hover:text-primary-600 transition-colors'>Testimoni</a>
             ${isAuth ? `<a href='/orders' data-link class='text-neutral-600 hover:text-primary-600 transition-colors'>Pesanan</a>` : ''}
+            ${isAuth ? `<a href='/rentals' data-link class='text-neutral-600 hover:text-primary-600 transition-colors'>Rental</a>` : ''}
           </div>
         </div>
         <div class='flex items-center gap-4'>
