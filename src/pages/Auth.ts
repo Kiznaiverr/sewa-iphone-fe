@@ -186,7 +186,7 @@ export function RegisterPage() {
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-neutral-700 mb-2">Email (Opsional)</label>
+              <label class="block text-sm font-semibold text-neutral-700 mb-2">Email</label>
               <input 
                 type="email" 
                 id="email" 
