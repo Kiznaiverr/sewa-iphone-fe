@@ -12,6 +12,18 @@ declare global {
     verifyCode: () => Promise<void>;
     resendCode: () => Promise<void>;
     backToSend: () => void;
+    closeAppVersionModal: () => void;
+    closeNewVersionModal: () => void;
+    dismissAppAnnouncement: () => void;
+    showLogoutConfirmation: () => void;
+    closeModal: () => void;
+    confirmLogout: () => void;
+    showOrderSuccessModal: () => void;
+    confirmDelete: (id: number) => void;
+    goToOrders: () => void;
+    __handleAlertClose: () => void;
+    __confirmUserAction: () => void;
+    __deleteTestimonialCallback: (id: number) => void;
   }
 }
 

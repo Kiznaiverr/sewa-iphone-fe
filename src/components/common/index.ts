@@ -15,5 +15,11 @@ export {
   showDeleteModal,
   confirmDelete,
   showUserActionModal,
-  showNotification
+  showNotification,
+  showAppVersionModal,
+  closeAppVersionModal,
+  showNewVersionModal,
+  closeNewVersionModal,
+  showAppAnnouncementModal,
+  dismissAppAnnouncement
 } from './Modals.js';

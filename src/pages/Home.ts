@@ -1,6 +1,6 @@
 import { Navbar, Footer } from '../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage } from '../components/common/index.js';
-import { testimonialAPI } from '../js/api/endpoints.js';
+import { LoadingSpinner, ErrorMessage, showNewVersionModal, showAppAnnouncementModal } from '../components/common/index.js';
+import { testimonialAPI, githubAPI } from '../js/api/endpoints.js';
 import { isAuthenticated } from '../js/utils/helpers.js';
 
 export async function HomePage() {
@@ -236,6 +236,7 @@ export async function HomePage() {
 
   loadTestimonials();
   initializeSlider();
+  checkAppVersion();
 
   // Add scroll effect
   const observerOptions = {
@@ -257,6 +258,38 @@ export async function HomePage() {
   document.querySelectorAll('.scroll-effect').forEach(section => {
     observer.observe(section);
   });
+}
+
+async function checkAppVersion() {
+  try {
+    const releaseData = await githubAPI.getLatestRelease();
+    
+    if (!releaseData || !releaseData.tag_name) {
+      return;
+    }
+
+    // Check if user has already seen this version (localStorage)
+    const lastSeenVersion = localStorage.getItem('lastSeenAppVersion');
+    
+    // Prioritas 1: Tampilkan modal versi baru jika ada update
+    if (!lastSeenVersion || lastSeenVersion !== releaseData.tag_name) {
+      setTimeout(() => {
+        showNewVersionModal(releaseData);
+      }, 1500);
+      return; // Exit if new version modal is shown
+    }
+    
+    const announcementDismissed = sessionStorage.getItem('appAnnouncementDismissed');
+    
+    if (!announcementDismissed) {
+      setTimeout(() => {
+        showAppAnnouncementModal(releaseData);
+      }, 1500);
+    }
+  } catch (error) {
+    console.error('Error checking app version:', error);
+    // Fail silently - don't show error to user
+  }
 }
 
 async function loadTestimonials() {

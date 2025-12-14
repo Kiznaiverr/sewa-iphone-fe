@@ -66,3 +66,16 @@ export const adminAPI = {
     delete: (id) => apiClient.delete(`/api/admin/testimonial/${id}`),
   },
 };
+
+export const githubAPI = {
+  getLatestRelease: async () => {
+    try {
+      const response = await fetch('https://api.github.com/repos/Kiznaiverr/iRent/releases/latest');
+      if (!response.ok) throw new Error('Failed to fetch latest release');
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching GitHub release:', error);
+      throw error;
+    }
+  },
+};

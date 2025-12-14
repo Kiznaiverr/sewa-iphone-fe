@@ -15,7 +15,7 @@ import { ForgotPasswordPage } from './pages/ForgotPassword.js';
 import { ResetPasswordPage } from './pages/ResetPassword.js';
 import { AdminDashboardPage, AdminIphonesPage, AdminCreateIphonePage, AdminOrdersPage, AdminRentalsPage, AdminUsersPage } from './pages/admin/AdminPages.js';
 import { AdminTestimonialsPage } from './pages/admin/AdminTestimonialsPage.js';
-import { showLogoutConfirmation, closeModal, confirmLogout, showOrderSuccessModal, confirmDelete } from './components/common/index.js';
+import { showLogoutConfirmation, closeModal, confirmLogout, showOrderSuccessModal, confirmDelete, closeAppVersionModal, closeNewVersionModal, dismissAppAnnouncement } from './components/common/index.js';
 
 const router = new Router();
 
@@ -155,6 +155,9 @@ window.closeModal = closeModal;
 window.confirmLogout = confirmLogout;
 window.showOrderSuccessModal = showOrderSuccessModal;
 window.confirmDelete = confirmDelete;
+window.closeAppVersionModal = closeAppVersionModal;
+window.closeNewVersionModal = closeNewVersionModal;
+window.dismissAppAnnouncement = dismissAppAnnouncement;
 window.goToOrders = () => {
   router.navigate('/orders');
 };
