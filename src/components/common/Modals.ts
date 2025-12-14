@@ -328,7 +328,7 @@ export function showNewVersionModal(releaseData) {
           <div class="relative z-10">
             <div class="flex items-center gap-3 mb-2">
               <div class="w-12 h-12 bg-white rounded-xl flex-center p-2 shadow-md">
-                <img src="/icons/android-chrome-192x192.png" alt="iRent App" class="w-full h-full object-contain">
+                <img src="/icons/favicon-32x32.png" alt="iRent App" class="w-full h-full object-contain">
               </div>
               <div>
                 <div class="inline-flex items-center gap-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-3 py-1 mb-1">
@@ -440,7 +440,7 @@ export function showAppAnnouncementModal(releaseData) {
           <div class="relative z-10">
             <div class="flex items-center gap-3 mb-2">
               <div class="w-12 h-12 bg-white rounded-xl flex-center p-2 shadow-md">
-                <img src="/icons/android-chrome-192x192.png" alt="iRent App" class="w-full h-full object-contain">
+                <img src="/icons/favicon-32x32.png" alt="iRent App" class="w-full h-full object-contain">
               </div>
               <div>
                 <h2 class="text-2xl font-bold">Aplikasi Mobile Tersedia!</h2>
@@ -454,7 +454,7 @@ export function showAppAnnouncementModal(releaseData) {
           <div class="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl p-4 mb-6">
             <div class="flex items-center gap-3">
               <div class="bg-white rounded-lg p-2 shadow-md">
-                <img src="/icons/android-chrome-192x192.png" alt="iRent App" class="w-8 h-8 object-contain">
+                <img src="/icons/favicon-32x32.png" alt="iRent App" class="w-8 h-8 object-contain">
               </div>
               <div class="flex-1">
                 <h3 class="font-bold text-lg text-neutral-800">${name || `iRent ${tag_name}`}</h3>
