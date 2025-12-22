@@ -145,12 +145,16 @@ function renderIphones(iphones: IPhone[]) {
   }
 
   container.innerHTML = iphones.map((iphone: IPhone) => {
-    const imageUrl = Array.isArray(iphone.images) && iphone.images.length ? iphone.images[0] : null;
+    // Handle images - could be string or array
+    const imageUrl = iphone.images && typeof iphone.images === 'string' ? iphone.images : null;
+    const images = Array.isArray(iphone.images) ? iphone.images : (imageUrl ? [imageUrl] : []);
+    const displayImage = images.length > 0 ? images[0] : null;
+    
     return `
     <div class="card-hover cursor-pointer" onclick="window.location.href = '/iphones/${iphone.id}'">
       <div class="h-64 bg-neutral-200 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
-        ${imageUrl ? 
-          `<img src="${imageUrl}" alt="${iphone.name}" class="max-w-full max-h-full object-contain">` : 
+        ${displayImage ? 
+          `<img src="${displayImage}" alt="${iphone.name}" class="max-w-full max-h-full object-contain">` : 
           '<div class="w-full h-full flex-center text-neutral-500">No Image</div>'}
       </div>
       <h3 class="font-bold text-lg mb-2">${iphone.name}</h3>
