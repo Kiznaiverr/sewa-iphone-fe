@@ -5,6 +5,7 @@ import { formatCurrency, formatDate, isAuthenticated } from '../js/utils/helpers
 
 export async function OrdersPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAuthenticated()) {
     app.innerHTML = `

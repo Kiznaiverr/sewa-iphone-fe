@@ -1,4 +1,4 @@
-export function EmptyState(title, message, actionText = null, actionLink = null) {
+export function EmptyState(title: string, message: string, actionText: string | null = null, actionLink: string | null = null) {
   return `
     <div class="flex flex-col items-center justify-center py-16">
       <div class="w-20 h-20 bg-neutral-200 rounded-full flex-center mb-4">
@@ -15,7 +15,7 @@ export function EmptyState(title, message, actionText = null, actionLink = null)
   `;
 }
 
-export function ErrorMessage(message, retry = null) {
+export function ErrorMessage(message: string, retry: (() => void) | null = null) {
   return `
     <div class="alert alert-error">
       <div class="flex-between">
@@ -29,7 +29,7 @@ export function ErrorMessage(message, retry = null) {
   `;
 }
 
-export function SuccessMessage(message) {
+export function SuccessMessage(message: string) {
   return `
     <p class="text-success font-medium">${message}</p>
   `;

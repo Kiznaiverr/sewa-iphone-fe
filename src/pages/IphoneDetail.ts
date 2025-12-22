@@ -3,8 +3,9 @@ import { LoadingSpinner, ErrorMessage, showOrderSuccessModal } from '../componen
 import { iphoneAPI, userAPI } from '../js/api/endpoints.js';
 import { formatCurrency, calculateDays, calculateTotalPrice, showNotification } from '../js/utils/helpers.js';
 
-export async function IphoneDetailPage(id) {
+export async function IphoneDetailPage(id: string) {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}
@@ -19,7 +20,7 @@ export async function IphoneDetailPage(id) {
   loadIphoneDetail(id);
 }
 
-async function loadIphoneDetail(id) {
+async function loadIphoneDetail(id: string) {
   try {
     const response = await iphoneAPI.getById(id);
     const iphone = response.data.data;

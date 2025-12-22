@@ -1,4 +1,14 @@
-export function Modal(title, content, footer = '') {
+declare global {
+  interface Window {
+    __router: any;
+    __handleDynamicRoute: (path: string) => void;
+    __handleAlertClose: () => void;
+    __confirmUserAction: () => void;
+    __deleteTestimonialCallback: (id: number) => void;
+  }
+}
+
+export function Modal(title: string, content: string, footer: string = '') {
   return `
     <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex-center animate-modal-fade-in">
       <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 animate-modal-slide-up animate-modal-bounce">
@@ -110,7 +120,7 @@ export function showOrderSuccessModal() {
   }, 3000);
 }
 
-export function showAlertModal(message, isSuccess = false, onClose = null) {
+export function showAlertModal(message: string, isSuccess: boolean = false, onClose: (() => void) | null = null) {
   let modalContainer = document.getElementById('modal-container');
   if (!modalContainer) {
     modalContainer = document.createElement('div');
@@ -153,7 +163,7 @@ export function showAlertModal(message, isSuccess = false, onClose = null) {
   modalContainer.innerHTML = modal;
 }
 
-export function showDeleteModal(testimonialId) {
+export function showDeleteModal(testimonialId: number) {
   const modal = Modal(
     'Konfirmasi Hapus Testimoni',
     `
@@ -187,7 +197,7 @@ export function showDeleteModal(testimonialId) {
   modalContainer.innerHTML = modal;
 }
 
-export function confirmDelete(testimonialId) {
+export function confirmDelete(testimonialId: number) {
   // Close modal
   closeModal();
 
@@ -197,7 +207,7 @@ export function confirmDelete(testimonialId) {
   }
 }
 
-export function showUserActionModal(title, message, onConfirm) {
+export function showUserActionModal(title: string, message: string, onConfirm: () => void) {
   const modal = Modal(
     title,
     `
@@ -309,11 +319,11 @@ export function showNotification(message: string, type: 'success' | 'error' | 'i
 }
 
 // Modal untuk versi baru aplikasi (localStorage - permanent)
-export function showNewVersionModal(releaseData) {
+export function showNewVersionModal(releaseData: any) {
   const { tag_name, name, body, html_url, assets } = releaseData;
   
   // Find Android APK asset
-  const apkAsset = assets?.find(asset => 
+  const apkAsset = assets?.find((asset: any) => 
     asset.name.toLowerCase().endsWith('.apk')
   );
 
@@ -368,7 +378,7 @@ export function showNewVersionModal(releaseData) {
                 Apa yang baru:
               </h4>
               <div class="text-sm text-neutral-600 bg-neutral-50 rounded-lg p-4 max-h-32 overflow-y-auto space-y-1">
-                ${body.split('\n').slice(0, 5).map(line => `
+                ${body.split('\n').slice(0, 5).map((line: string) => `
                   <p class="leading-relaxed">${line}</p>
                 `).join('')}
               </div>
@@ -421,11 +431,11 @@ export function closeNewVersionModal() {
 }
 
 // Modal untuk promosi umum (sessionStorage - reset saat tab ditutup)
-export function showAppAnnouncementModal(releaseData) {
+export function showAppAnnouncementModal(releaseData: any) {
   const { tag_name, name, html_url, assets } = releaseData;
   
   // Find Android APK asset
-  const apkAsset = assets?.find(asset => 
+  const apkAsset = assets?.find((asset: any) => 
     asset.name.toLowerCase().endsWith('.apk')
   );
 
@@ -521,7 +531,7 @@ export function dismissAppAnnouncement() {
 }
 
 // Backward compatibility - alias untuk modal lama
-export function showAppVersionModal(releaseData) {
+export function showAppVersionModal(releaseData: any) {
   showAppAnnouncementModal(releaseData);
 }
 

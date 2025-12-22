@@ -11,8 +11,9 @@ function calculateDuration(startDate, endDate) {
   return diffDays;
 }
 
-export async function TrackOrderPage(code) {
+export async function TrackOrderPage(code: string) {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAuthenticated()) {
     app.innerHTML = `

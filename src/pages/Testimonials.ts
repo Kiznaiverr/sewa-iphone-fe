@@ -5,6 +5,7 @@ import { showNotification, isAuthenticated } from '../js/utils/helpers.js';
 
 export async function TestimonialsPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}

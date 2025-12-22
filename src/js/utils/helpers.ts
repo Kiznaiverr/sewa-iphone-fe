@@ -7,7 +7,7 @@ export const getCurrentUser = () => {
   return user ? JSON.parse(user) : null;
 };
 
-export const setAuthData = (token, user) => {
+export const setAuthData = (token: string, user: any) => {
   localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify(user));
 };
@@ -22,14 +22,14 @@ export const isAdmin = () => {
   return user && user.role === 'admin';
 };
 
-export const formatCurrency = (value) => {
+export const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
   }).format(value);
 };
 
-export const formatDate = (dateString) => {
+export const formatDate = (dateString: string) => {
   if (!dateString) return 'Tanggal tidak tersedia';
 
   try {
@@ -49,7 +49,7 @@ export const formatDate = (dateString) => {
   }
 };
 
-export const formatDateAndTime = (dateString) => {
+export const formatDateAndTime = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('id-ID', {
     year: 'numeric',
     month: 'long',
@@ -59,19 +59,19 @@ export const formatDateAndTime = (dateString) => {
   });
 };
 
-export const calculateDays = (startDate, endDate) => {
+export const calculateDays = (startDate: string, endDate: string) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 };
 
-export const calculateTotalPrice = (pricePerDay, days) => {
+export const calculateTotalPrice = (pricePerDay: number, days: number) => {
   return pricePerDay * days;
 };
 
-export const debounce = (func, wait) => {
-  let timeout;
-  return function executedFunction(...args) {
+export const debounce = (func: (...args: any[]) => void, wait: number) => {
+  let timeout: NodeJS.Timeout;
+  return function executedFunction(...args: any[]) {
     const later = () => {
       clearTimeout(timeout);
       func(...args);
@@ -81,9 +81,9 @@ export const debounce = (func, wait) => {
   };
 };
 
-export const throttle = (func, limit) => {
-  let inThrottle;
-  return function (...args) {
+export const throttle = (func: (...args: any[]) => void, limit: number) => {
+  let inThrottle: boolean;
+  return function (this: any, ...args: any[]) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
@@ -92,7 +92,7 @@ export const throttle = (func, limit) => {
   };
 };
 
-export const showNotification = (message, type = 'info') => {
+export const showNotification = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
   const notificationDiv = document.createElement('div');
 
   const colorMap = {
@@ -129,22 +129,22 @@ export const showNotification = (message, type = 'info') => {
   }, 3000);
 };
 
-export const validateEmail = (email) => {
+export const validateEmail = (email: string) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
-export const validatePhone = (phone) => {
+export const validatePhone = (phone: string) => {
   return /^(\+62|62|0)[0-9]{9,12}$/.test(phone.replace(/\D/g, ''));
 };
 
-export const validateNIK = (nik) => {
+export const validateNIK = (nik: string) => {
   return /^\d{16}$/.test(nik);
 };
 
-export const validatePassword = (password) => {
+export const validatePassword = (password: string) => {
   return password.length >= 6;
 };
 
-export const validateUsername = (username) => {
+export const validateUsername = (username: string) => {
   return /^[a-zA-Z0-9_]{3,20}$/.test(username);
 };

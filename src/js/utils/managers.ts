@@ -1,11 +1,21 @@
+interface ValidationRule {
+  type: string;
+  message: string;
+  value?: any;
+  validator?: (value: any) => boolean;
+}
+
 export class FormValidator {
-  constructor(formId) {
+  form: HTMLElement | null;
+  errors: Record<string, string[]>;
+
+  constructor(formId: string) {
     this.form = document.getElementById(formId);
     this.errors = {};
   }
 
-  validate(fieldName, value, rules) {
-    const fieldErrors = [];
+  validate(fieldName: string, value: any, rules: ValidationRule[]) {
+    const fieldErrors: string[] = [];
 
     rules.forEach(rule => {
       if (!this.executeRule(rule, value)) {
@@ -22,7 +32,7 @@ export class FormValidator {
     return fieldErrors.length === 0;
   }
 
-  executeRule(rule, value) {
+  executeRule(rule: ValidationRule, value: any) {
     switch (rule.type) {
       case 'required':
         return value.trim().length > 0;
@@ -39,7 +49,7 @@ export class FormValidator {
       case 'match':
         return value === rule.value;
       case 'custom':
-        return rule.validator(value);
+        return rule.validator ? rule.validator(value) : true;
       default:
         return true;
     }
@@ -55,8 +65,8 @@ export class FormValidator {
 
   displayErrors() {
     Object.keys(this.errors).forEach(fieldName => {
-      const field = this.form.querySelector(`[name="${fieldName}"]`);
-      const errorContainer = field?.parentElement.querySelector('.error-message');
+      const field = this.form!.querySelector(`[name="${fieldName}"]`) as HTMLElement;
+      const errorContainer = field?.parentElement?.querySelector('.error-message') as HTMLElement;
 
       if (errorContainer) {
         errorContainer.textContent = this.errors[fieldName][0];
@@ -68,17 +78,17 @@ export class FormValidator {
 
   clearErrors() {
     this.errors = {};
-    this.form.querySelectorAll('.error-message').forEach(el => {
-      el.style.display = 'none';
+    this.form!.querySelectorAll('.error-message').forEach(el => {
+      (el as HTMLElement).style.display = 'none';
     });
-    this.form.querySelectorAll('.input-error').forEach(el => {
-      el.classList.remove('input-error');
+    this.form!.querySelectorAll('.input-error').forEach(el => {
+      (el as HTMLElement).classList.remove('input-error');
     });
   }
 
   getData() {
-    const formData = new FormData(this.form);
-    const data = {};
+    const formData = new FormData(this.form as HTMLFormElement);
+    const data: Record<string, any> = {};
 
     formData.forEach((value, key) => {
       if (data[key]) {
@@ -97,7 +107,14 @@ export class FormValidator {
 }
 
 export class TableManager {
-  constructor(tableId) {
+  table: HTMLElement | null;
+  data: any[];
+  currentPage: number;
+  itemsPerPage: number;
+  sortField: string | null;
+  sortDirection: 'asc' | 'desc';
+
+  constructor(tableId: string) {
     this.table = document.getElementById(tableId);
     this.data = [];
     this.currentPage = 1;
@@ -106,27 +123,27 @@ export class TableManager {
     this.sortDirection = 'asc';
   }
 
-  setData(data) {
+  setData(data: any[]) {
     this.data = data;
     this.render();
   }
 
-  addRow(data) {
+  addRow(data: any) {
     this.data.push(data);
     this.render();
   }
 
-  deleteRow(index) {
+  deleteRow(index: number) {
     this.data.splice(index, 1);
     this.render();
   }
 
-  updateRow(index, data) {
+  updateRow(index: number, data: any) {
     this.data[index] = { ...this.data[index], ...data };
     this.render();
   }
 
-  sort(field) {
+  sort(field: string) {
     if (this.sortField === field) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -146,12 +163,12 @@ export class TableManager {
     this.render();
   }
 
-  filter(predicate) {
+  filter(predicate: (item: any) => boolean) {
     const filtered = this.data.filter(predicate);
     return filtered;
   }
 
-  search(query, fields) {
+  search(query: string, fields: string[]) {
     const lowercaseQuery = query.toLowerCase();
     return this.data.filter(item =>
       fields.some(field => String(item[field]).toLowerCase().includes(lowercaseQuery))
@@ -168,7 +185,7 @@ export class TableManager {
     return Math.ceil(this.data.length / this.itemsPerPage);
   }
 
-  setPage(page) {
+  setPage(page: number) {
     this.currentPage = Math.max(1, Math.min(page, this.getTotalPages()));
     this.render();
   }
@@ -177,6 +194,8 @@ export class TableManager {
     if (!this.table) return;
 
     const tbody = this.table.querySelector('tbody');
+    if (!tbody) return;
+
     const paginatedData = this.paginate();
 
     tbody.innerHTML = paginatedData.map((row) => `
@@ -190,12 +209,15 @@ export class TableManager {
 }
 
 export class StateManager {
-  constructor(initialState = {}) {
+  state: Record<string, any>;
+  listeners: Set<(state: Record<string, any>) => void>;
+
+  constructor(initialState: Record<string, any> = {}) {
     this.state = initialState;
     this.listeners = new Set();
   }
 
-  setState(updates) {
+  setState(updates: Record<string, any>) {
     this.state = { ...this.state, ...updates };
     this.notifyListeners();
   }
@@ -204,7 +226,7 @@ export class StateManager {
     return this.state;
   }
 
-  subscribe(listener) {
+  subscribe(listener: (state: Record<string, any>) => void) {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   }
@@ -215,17 +237,20 @@ export class StateManager {
 }
 
 export class CacheManager {
-  constructor(ttl = 5 * 60 * 1000) {
+  cache: Map<string, { value: any; timestamp: number }>;
+  ttl: number;
+
+  constructor(ttl: number = 5 * 60 * 1000) {
     this.cache = new Map();
     this.ttl = ttl;
   }
 
-  set(key, value) {
+  set(key: string, value: any) {
     const timestamp = Date.now();
     this.cache.set(key, { value, timestamp });
   }
 
-  get(key) {
+  get(key: string) {
     const item = this.cache.get(key);
 
     if (!item) return null;
@@ -238,11 +263,11 @@ export class CacheManager {
     return item.value;
   }
 
-  has(key) {
+  has(key: string) {
     return this.get(key) !== null;
   }
 
-  delete(key) {
+  delete(key: string) {
     this.cache.delete(key);
   }
 

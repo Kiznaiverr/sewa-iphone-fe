@@ -134,6 +134,7 @@ router.register('/admin/testimonials', () => {
 
 router.setNotFound(() => {
   const app = document.getElementById('app');
+  if (!app) return;
   app.innerHTML = `
     <div class="min-h-screen flex-center">
       <div class="text-center">

@@ -1,24 +1,28 @@
 export class Router {
+  routes: Map<string, () => void>;
+  currentPath: string;
+  notFoundCallback: (() => void) | null;
+
   constructor() {
     this.routes = new Map();
     this.currentPath = '';
     this.notFoundCallback = null;
   }
 
-  register(path, callback) {
+  register(path: string, callback: () => void) {
     this.routes.set(path, callback);
   }
 
-  setNotFound(callback) {
+  setNotFound(callback: () => void) {
     this.notFoundCallback = callback;
   }
 
-  navigate(path) {
+  navigate(path: string) {
     window.history.pushState({ path }, '', path);
     this.render(path);
   }
 
-  render(path) {
+  render(path: string) {
     this.currentPath = path;
     const callback = this.routes.get(path);
 
@@ -40,10 +44,11 @@ export class Router {
     });
 
     document.addEventListener('click', (e) => {
-      const link = e.target.closest('a[data-link]');
+      const link = (e.target as Element)?.closest('a[data-link]');
       if (link) {
         e.preventDefault();
-        this.navigate(link.getAttribute('href'));
+        const href = link.getAttribute('href');
+        if (href) this.navigate(href);
       }
     });
 

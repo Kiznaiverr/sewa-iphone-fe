@@ -1,6 +1,7 @@
 export function Navbar() {
   const isAuth = localStorage.getItem('token');
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+  const userData = localStorage.getItem('user');
+  const user = userData ? JSON.parse(userData) : null;
 
   return `
     <nav class='bg-white/95 backdrop-blur-md border-b border-neutral-200/50 sticky top-0 z-40 shadow-lg shadow-neutral-900/5'>
@@ -120,7 +121,8 @@ export function Footer() {
 }
 
 export function Sidebar() {
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+  const userData = localStorage.getItem('user');
+  const user = userData ? JSON.parse(userData) : null;
 
   if (user?.role !== 'admin') return '';
 
@@ -146,7 +148,8 @@ export function Sidebar() {
 }
 
 export function updateNavbarProfilePhoto() {
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+  const userData = localStorage.getItem('user');
+  const user = userData ? JSON.parse(userData) : null;
   const profilePhotoContainer = document.getElementById('navbar-profile-photo');
   
   if (profilePhotoContainer && user) {

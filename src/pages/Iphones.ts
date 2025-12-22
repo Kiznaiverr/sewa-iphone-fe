@@ -5,6 +5,7 @@ import { formatCurrency } from '../js/utils/helpers.js';
 
 export async function IphonesPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}

@@ -5,6 +5,7 @@ import { setAuthData, validateEmail, validatePhone, validateNIK, validatePasswor
 
 export function LoginPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}
@@ -80,32 +81,37 @@ export function LoginPage() {
     ${Footer()}
   `;
 
-  document.getElementById('login-form').addEventListener('submit', handleLogin);
+  const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
+  if (loginForm) loginForm.addEventListener('submit', handleLogin);
 
   // Toggle password visibility
-  const togglePassword = document.getElementById('toggle-password');
-  const passwordInput = document.getElementById('password');
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    togglePassword.innerHTML = type === 'password' 
-      ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-        </svg>`
-      : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-        </svg>`;
-  });
+  const togglePassword = document.getElementById('toggle-password') as HTMLButtonElement | null;
+  const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+  if (togglePassword && passwordInput) {
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePassword.innerHTML = type === 'password' 
+        ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>`
+        : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+          </svg>`;
+    });
+  }
 }
 
-async function handleLogin(e) {
+async function handleLogin(e: Event) {
   e.preventDefault();
 
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const errorDiv = document.getElementById('login-error');
-  const form = document.getElementById('login-form');
+  const usernameInput = document.getElementById('username') as HTMLInputElement | null;
+  const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+  const username = usernameInput?.value ?? '';
+  const password = passwordInput?.value ?? '';
+  const errorDiv = document.getElementById('login-error') as HTMLElement | null;
+  const form = document.getElementById('login-form') as HTMLFormElement | null; 
 
   try {
     const response = await authAPI.login({ username, password });
@@ -151,6 +157,7 @@ async function handleLogin(e) {
 
 export function RegisterPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}

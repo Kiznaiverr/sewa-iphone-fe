@@ -5,6 +5,7 @@ import { isAuthenticated } from '../js/utils/helpers.js';
 
 export async function HomePage() {
   const app = document.getElementById('app');
+  if (!app) return;
   const isLoggedIn = isAuthenticated();
 
   app.innerHTML = `
@@ -376,13 +377,18 @@ async function initializeSlider() {
 
     // State untuk slider
     let currentSlide = 0;
-    let autoPlayInterval;
+    let autoPlayInterval: number | null = null;
 
     // Get DOM elements
-    const sliderContainer = document.getElementById('slider-container');
-    const sliderPrev = document.getElementById('slider-prev');
-    const sliderNext = document.getElementById('slider-next');
-    const sliderDots = document.getElementById('slider-dots');
+    const sliderContainer = document.getElementById('slider-container') as HTMLElement | null;
+    const sliderPrev = document.getElementById('slider-prev') as HTMLElement | null;
+    const sliderNext = document.getElementById('slider-next') as HTMLElement | null;
+    const sliderDots = document.getElementById('slider-dots') as HTMLElement | null;
+
+    if (!sliderContainer || !sliderDots) {
+      console.warn('Slider DOM elements not found');
+      return;
+    }
 
     // Generate slides HTML
     sliderContainer.innerHTML = imageFiles.map((image, index) => `
@@ -397,60 +403,70 @@ async function initializeSlider() {
     `).join('');
 
     // Show slide function
-    const showSlide = (index) => {
+    const showSlide = (index: number) => {
       // Normalize index
       currentSlide = (index + imageFiles.length) % imageFiles.length;
 
       // Update slides
       document.querySelectorAll('.slider-slide').forEach(slide => {
-        const slideIndex = parseInt(slide.getAttribute('data-index'));
-        slide.classList.toggle('opacity-100', slideIndex === currentSlide);
-        slide.classList.toggle('opacity-0', slideIndex !== currentSlide);
+        const slideIndex = parseInt(slide.getAttribute('data-index') ?? '0');
+        const el = slide as HTMLElement;
+        el.classList.toggle('opacity-100', slideIndex === currentSlide);
+        el.classList.toggle('opacity-0', slideIndex !== currentSlide);
       });
 
       // Update dots
       document.querySelectorAll('.slider-dot').forEach(dot => {
-        const dotIndex = parseInt(dot.getAttribute('data-index'));
+        const dotIndex = parseInt(dot.getAttribute('data-index') ?? '0');
+        const el = dot as HTMLElement;
         if (dotIndex === currentSlide) {
-          dot.classList.remove('w-2');
-          dot.classList.add('w-8', 'bg-opacity-100');
+          el.classList.remove('w-2');
+          el.classList.add('w-8', 'bg-opacity-100');
         } else {
-          dot.classList.remove('w-8', 'bg-opacity-100');
-          dot.classList.add('w-2', 'bg-opacity-50');
+          el.classList.remove('w-8', 'bg-opacity-100');
+          el.classList.add('w-2', 'bg-opacity-50');
         }
       });
     };
 
     // Start auto play function
     const startAutoPlay = () => {
-      autoPlayInterval = setInterval(() => {
+      if (autoPlayInterval !== null) clearInterval(autoPlayInterval);
+      autoPlayInterval = window.setInterval(() => {
         showSlide(currentSlide + 1);
       }, 5000); // Change slide setiap 5 detik
     };
 
     // Stop auto play function
     const stopAutoPlay = () => {
-      clearInterval(autoPlayInterval);
+      if (autoPlayInterval !== null) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
     };
 
     // Event listeners untuk buttons
-    sliderPrev.addEventListener('click', () => {
-      stopAutoPlay();
-      showSlide(currentSlide - 1);
-      startAutoPlay();
-    });
+    if (sliderPrev) {
+      sliderPrev.addEventListener('click', () => {
+        stopAutoPlay();
+        showSlide(currentSlide - 1);
+        startAutoPlay();
+      });
+    }
 
-    sliderNext.addEventListener('click', () => {
-      stopAutoPlay();
-      showSlide(currentSlide + 1);
-      startAutoPlay();
-    });
+    if (sliderNext) {
+      sliderNext.addEventListener('click', () => {
+        stopAutoPlay();
+        showSlide(currentSlide + 1);
+        startAutoPlay();
+      });
+    }
 
     // Event listeners untuk dots
     document.querySelectorAll('.slider-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         stopAutoPlay();
-        showSlide(parseInt(dot.getAttribute('data-index')));
+        showSlide(parseInt(dot.getAttribute('data-index') ?? '0'));
         startAutoPlay();
       });
     });
@@ -465,16 +481,18 @@ async function initializeSlider() {
   } catch (error) {
     console.error('Error loading slider images:', error);
     // Fallback jika fetch error
-    const sliderContainer = document.getElementById('slider-container');
-    sliderContainer.innerHTML = `
-      <div class="flex items-center justify-center h-full bg-gradient-to-br from-primary-300 to-secondary-300">
-        <div class="text-center">
-          <svg class="w-16 h-16 text-white mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
-          <p class="text-white opacity-75">Banner images loading...</p>
+    const fallbackContainer = document.getElementById('slider-container');
+    if (fallbackContainer) {
+      fallbackContainer.innerHTML = `
+        <div class="flex items-center justify-center h-full bg-gradient-to-br from-primary-300 to-secondary-300">
+          <div class="text-center">
+            <svg class="w-16 h-16 text-white mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-white opacity-75">Banner images loading...</p>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
   }
 }
