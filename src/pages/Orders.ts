@@ -2,9 +2,11 @@ import { Navbar, Footer } from '../components/layout/Layout.js';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/common/index.js';
 import { userAPI } from '../js/api/endpoints.js';
 import { formatCurrency, formatDate, isAuthenticated } from '../js/utils/helpers.js';
+import type { Order, OrderStatus } from '../types/index.js';
 
 export async function OrdersPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAuthenticated()) {
     app.innerHTML = `
@@ -38,10 +40,13 @@ export async function OrdersPage() {
 async function loadOrders() {
   try {
     const response = await userAPI.getOrders();
-    const orders = response.data.data;
+    const orders: Order[] = response.data.data || [];
+    const container = document.getElementById('orders-container');
+
+    if (!container) return;
 
     if (!Array.isArray(orders) || orders.length === 0) {
-      document.getElementById('orders-container').innerHTML = EmptyState(
+      container.innerHTML = EmptyState(
         'Belum Ada Pesanan',
         'Mulai sewa iPhone favorit Anda sekarang',
         'Lihat Produk',
@@ -50,14 +55,14 @@ async function loadOrders() {
       return;
     }
 
-    const statusBadgeMap = {
-      'pre_ordered': 'badge-warning',
-      'approved': 'badge-success',
-      'completed': 'badge-info',
+    const statusBadgeMap: Record<OrderStatus, string> = {
+      pre_ordered: 'badge-warning',
+      approved: 'badge-success',
+      completed: 'badge-info',
+      rejected: 'badge-danger',
     };
 
-    const container = document.getElementById('orders-container');
-    container.innerHTML = orders.map(order => `
+    container.innerHTML = orders.map((order: Order) => `
       <div class="card mb-4">
         <div class="flex-between mb-4">
           <div>
@@ -90,14 +95,15 @@ async function loadOrders() {
       </div>
     `).join('');
 
-    window.trackOrder = (code) => {
+    window.trackOrder = (code: string) => {
       // Use dynamic route handler
       window.__handleDynamicRoute(`/orders/track/${code}`);
     };
   } catch (error) {
     console.error('Error loading orders:', error);
-    document.getElementById('orders-container').innerHTML = ErrorMessage(
-      'Gagal memuat pesanan. Silakan coba lagi.'
-    );
+    const container = document.getElementById('orders-container');
+    if (container) {
+      container.innerHTML = ErrorMessage('Gagal memuat pesanan. Silakan coba lagi.');
+    }
   }
 }

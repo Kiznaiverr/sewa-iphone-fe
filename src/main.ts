@@ -21,7 +21,7 @@ const router = new Router();
 
 window.__router = router;
 
-function handleDynamicRoute(path) {
+function handleDynamicRoute(path: string) {
   const matchedRoute = path.match(/^\/iphones\/(\d+)$/);
   const trackOrderRoute = path.match(/^\/orders\/track\/(.+)$/);
 
@@ -134,6 +134,7 @@ router.register('/admin/testimonials', () => {
 
 router.setNotFound(() => {
   const app = document.getElementById('app');
+  if (!app) return;
   app.innerHTML = `
     <div class="min-h-screen flex-center">
       <div class="text-center">

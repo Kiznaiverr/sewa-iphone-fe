@@ -13,6 +13,7 @@ export { AdminCreateIphonePage } from './AdminCreateIphonePage.js';
 
 export async function AdminDashboardPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = '<div class="container-main section text-center py-20"><p>Akses Ditolak</p></div>';
@@ -94,23 +95,34 @@ async function loadDashboardData() {
     const rentalsRes = results[3].status === 'fulfilled' ? results[3].value : {};
     const overdueRes = results[4].status === 'fulfilled' ? results[4].value : {};
 
-    // Parse response - axios wraps response in .data, then API wraps data in .data again
-    const users = Array.isArray(usersRes?.data?.data) ? usersRes.data.data : (Array.isArray(usersRes?.data) ? usersRes.data : (Array.isArray(usersRes) ? usersRes : []));
-    const iphones = Array.isArray(iphonesRes?.data?.data) ? iphonesRes.data.data : (Array.isArray(iphonesRes?.data) ? iphonesRes.data : (Array.isArray(iphonesRes) ? iphonesRes : []));
-    const orders = Array.isArray(ordersRes?.data?.data) ? ordersRes.data.data : (Array.isArray(ordersRes?.data) ? ordersRes.data : (Array.isArray(ordersRes) ? ordersRes : []));
-    const rentals = Array.isArray(rentalsRes?.data?.data) ? rentalsRes.data.data : (Array.isArray(rentalsRes?.data) ? rentalsRes.data : (Array.isArray(rentalsRes) ? rentalsRes : []));
-    const overdue = Array.isArray(overdueRes?.data?.data) ? overdueRes.data.data : (Array.isArray(overdueRes?.data) ? overdueRes.data : (Array.isArray(overdueRes) ? overdueRes : []));
+    // Loosen response typing for now and normalize arrays (axios -> api wrapper -> array).
+    const usersResAny = usersRes as any;
+    const iphonesResAny = iphonesRes as any;
+    const ordersResAny = ordersRes as any;
+    const rentalsResAny = rentalsRes as any;
+    const overdueResAny = overdueRes as any;
 
-    document.getElementById('stat-users').textContent = users.length;
-    document.getElementById('stat-iphones').textContent = iphones.length;
-    document.getElementById('stat-orders').textContent = orders.length;
-    document.getElementById('stat-rentals').textContent = rentals.length;
+    const users = Array.isArray(usersResAny?.data?.data) ? usersResAny.data.data : (Array.isArray(usersResAny?.data) ? usersResAny.data : (Array.isArray(usersResAny) ? usersResAny : []));
+    const iphones = Array.isArray(iphonesResAny?.data?.data) ? iphonesResAny.data.data : (Array.isArray(iphonesResAny?.data) ? iphonesResAny.data : (Array.isArray(iphonesResAny) ? iphonesResAny : []));
+    const orders = Array.isArray(ordersResAny?.data?.data) ? ordersResAny.data.data : (Array.isArray(ordersResAny?.data) ? ordersResAny.data : (Array.isArray(ordersResAny) ? ordersResAny : []));
+    const rentals = Array.isArray(rentalsResAny?.data?.data) ? rentalsResAny.data.data : (Array.isArray(rentalsResAny?.data) ? rentalsResAny.data : (Array.isArray(rentalsResAny) ? rentalsResAny : []));
+    const overdue = Array.isArray(overdueResAny?.data?.data) ? overdueResAny.data.data : (Array.isArray(overdueResAny?.data) ? overdueResAny.data : (Array.isArray(overdueResAny) ? overdueResAny : []));
+
+    const statUsers = document.getElementById('stat-users');
+    const statIphones = document.getElementById('stat-iphones');
+    const statOrders = document.getElementById('stat-orders');
+    const statRentals = document.getElementById('stat-rentals');
+
+    if (statUsers) statUsers.textContent = String(users.length);
+    if (statIphones) statIphones.textContent = String(iphones.length);
+    if (statOrders) statOrders.textContent = String(orders.length);
+    if (statRentals) statRentals.textContent = String(rentals.length);
 
     let recentOrders = orders.slice(0, 5);
     let overdueRentals = overdue.slice(0, 5);
 
-    const renderDashboardLists = (ordersList, rentalsList) => {
-      const recentOrdersHtml = ordersList.length > 0 ? ordersList.map(order => `
+    const renderDashboardLists = (ordersList: any[], rentalsList: any[]) => {
+      const recentOrdersHtml = ordersList.length > 0 ? ordersList.map((order: any) => `
         <div class="py-3 border-b border-neutral-200 flex-between">
           <div>
             <p class="font-bold">${order.order_code || 'N/A'}</p>
@@ -120,9 +132,10 @@ async function loadDashboardData() {
         </div>
       `).join('') : '<p class="text-neutral-500">Tidak ada pesanan yang sesuai</p>';
 
-      document.getElementById('recent-orders').innerHTML = recentOrdersHtml;
+      const recentEl = document.getElementById('recent-orders');
+      if (recentEl) recentEl.innerHTML = recentOrdersHtml;
 
-      const overdueRentalsHtml = rentalsList.length > 0 ? rentalsList.map(rental => `
+      const overdueRentalsHtml = rentalsList.length > 0 ? rentalsList.map((rental: any) => `
         <div class="py-3 border-b border-neutral-200 flex-between">
           <div>
             <p class="font-bold">ID: ${rental.id}</p>
@@ -132,21 +145,23 @@ async function loadDashboardData() {
         </div>
       `).join('') : '<p class="text-neutral-500">Tidak ada rental overdue yang sesuai</p>';
 
-      document.getElementById('overdue-rentals').innerHTML = overdueRentalsHtml;
+      const overdueEl = document.getElementById('overdue-rentals');
+      if (overdueEl) overdueEl.innerHTML = overdueRentalsHtml;
     };
 
     renderDashboardLists(recentOrders, overdueRentals);
 
-    const searchInput = document.getElementById('dashboard-search');
+    const searchInput = document.getElementById('dashboard-search') as HTMLInputElement | null;
 
     const applySearch = () => {
+      if (!searchInput) return;
       const searchText = searchInput.value.toLowerCase();
 
-      const filteredOrders = recentOrders.filter(order =>
+      const filteredOrders = recentOrders.filter((order: any) =>
         (order.order_code || '').toLowerCase().includes(searchText)
       );
 
-      const filteredRentals = overdueRentals.filter(rental =>
+      const filteredRentals = overdueRentals.filter((rental: any) =>
         rental.id.toString().includes(searchText) ||
         (rental.user_name || '').toLowerCase().includes(searchText)
       );
@@ -154,15 +169,21 @@ async function loadDashboardData() {
       renderDashboardLists(filteredOrders, filteredRentals);
     };
 
-    searchInput.addEventListener('input', applySearch);
+    if (searchInput) searchInput.addEventListener('input', applySearch);
   } catch (error) {
     console.error('Error loading dashboard:', error);
-    document.getElementById('stat-users').textContent = '0';
-    document.getElementById('stat-iphones').textContent = '0';
-    document.getElementById('stat-orders').textContent = '0';
-    document.getElementById('stat-rentals').textContent = '0';
-    document.getElementById('recent-orders').innerHTML = '<p class="text-red-500">Gagal memuat data</p>';
-    document.getElementById('overdue-rentals').innerHTML = '<p class="text-red-500">Gagal memuat data</p>';
+    const statUsersFallback = document.getElementById('stat-users');
+    const statIphonesFallback = document.getElementById('stat-iphones');
+    const statOrdersFallback = document.getElementById('stat-orders');
+    const statRentalsFallback = document.getElementById('stat-rentals');
+    if (statUsersFallback) statUsersFallback.textContent = '0';
+    if (statIphonesFallback) statIphonesFallback.textContent = '0';
+    if (statOrdersFallback) statOrdersFallback.textContent = '0';
+    if (statRentalsFallback) statRentalsFallback.textContent = '0';
+    const recentFallback = document.getElementById('recent-orders');
+    const overdueFallback = document.getElementById('overdue-rentals');
+    if (recentFallback) recentFallback.innerHTML = '<p class="text-red-500">Gagal memuat data</p>';
+    if (overdueFallback) overdueFallback.innerHTML = '<p class="text-red-500">Gagal memuat data</p>';
   }
 }
 

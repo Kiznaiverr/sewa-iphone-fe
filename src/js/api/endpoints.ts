@@ -1,5 +1,5 @@
 import apiClient from './client.js';
-import { RegisterRequest, LoginRequest, VerifyCodeRequest, UpdateUserRequest, OrderRequest, CreateTestimonialRequest, CreateIPhoneRequest, UpdateIPhoneRequest, AddStockRequest, UpdateOrderStatusRequest, ForgotPasswordRequest, ResetPasswordRequest } from '../../types';
+import { RegisterRequest, LoginRequest, VerifyCodeRequest, ForgotPasswordRequest, ResetPasswordRequest } from '../../types';
 
 export const authAPI = {
   register: (data: RegisterRequest) => apiClient.post('/api/auth/register', data),
@@ -13,8 +13,8 @@ export const authAPI = {
 
 export const userAPI = {
   getProfile: () => apiClient.get('/api/user/profile'),
-  updateProfile: (data) => apiClient.put('/api/user/profile', data),
-  uploadProfilePhoto: (file) => {
+  updateProfile: (data: any) => apiClient.put('/api/user/profile', data),
+  uploadProfilePhoto: (file: File) => {
     const formData = new FormData();
     formData.append('profile_photo', file);
     return apiClient.post('/api/user/upload-profile-photo', formData, {
@@ -22,48 +22,48 @@ export const userAPI = {
     });
   },
   getOrders: () => apiClient.get('/api/order/user'),
-  trackOrder: (code) => apiClient.get(`/api/order/track/${code}`),
-  createOrder: (data) => apiClient.post('/api/order', data),
+  trackOrder: (code: string) => apiClient.get(`/api/order/track/${code}`),
+  createOrder: (data: any) => apiClient.post('/api/order', data),
   getRentals: () => apiClient.get('/api/rental/user'),
 };
 
 export const iphoneAPI = {
   getAll: () => apiClient.get('/api/iphone'),
-  getById: (id) => apiClient.get(`/api/iphone/${id}`),
+  getById: (id: number) => apiClient.get(`/api/iphone/${id}`),
 };
 
 export const testimonialAPI = {
   getAll: () => apiClient.get('/api/testimonial'),
-  create: (data) => apiClient.post('/api/testimonial', data),
+  create: (data: any) => apiClient.post('/api/testimonial', data),
 };
 
 export const adminAPI = {
   users: {
-    getAll: (status) => apiClient.get('/api/admin/user', { params: { status } }),
-    update: (id, data) => apiClient.put(`/api/admin/user/${id}`, data),
-    delete: (id) => apiClient.delete(`/api/admin/user/${id}`),
-    softDelete: (id) => apiClient.put(`/api/admin/user/${id}/soft-delete`),
+    getAll: (status?: string) => apiClient.get('/api/admin/user', { params: { status } }),
+    update: (id: number, data: any) => apiClient.put(`/api/admin/user/${id}`, data),
+    delete: (id: number) => apiClient.delete(`/api/admin/user/${id}`),
+    softDelete: (id: number) => apiClient.put(`/api/admin/user/${id}/soft-delete`),
   },
   iphones: {
-    getAll: (status = 'active') => apiClient.get('/api/admin/iphone/all', { params: { status } }),
-    getAllWithFilter: (status) => apiClient.get('/api/admin/iphone/all', { params: { status } }),
-    create: (data) => apiClient.post('/api/admin/iphone', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
-    update: (id, data) => apiClient.put(`/api/admin/iphone/${id}`, data),
-    delete: (id) => apiClient.delete(`/api/admin/iphone/${id}`),
-    addStock: (id, stock) => apiClient.put(`/api/admin/iphone/${id}/stock`, { stock }),
+    getAll: (status: string = 'active') => apiClient.get('/api/admin/iphone/all', { params: { status } }),
+    getAllWithFilter: (status?: string) => apiClient.get('/api/admin/iphone/all', { params: { status } }),
+    create: (data: any) => apiClient.post('/api/admin/iphone', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    update: (id: number, data: any) => apiClient.put(`/api/admin/iphone/${id}`, data),
+    delete: (id: number) => apiClient.delete(`/api/admin/iphone/${id}`),
+    addStock: (id: number, stock: number) => apiClient.put(`/api/admin/iphone/${id}/stock`, { stock }),
   },
   orders: {
-    getAll: (sort, status) => apiClient.get('/api/admin/order', { params: { sort, status } }),
-    updateStatus: (id, status) => apiClient.put(`/api/admin/order/${id}/status`, { status }),
+    getAll: (sort?: string, status?: string) => apiClient.get('/api/admin/order', { params: { sort, status } }),
+    updateStatus: (id: number, status: string) => apiClient.put(`/api/admin/order/${id}/status`, { status }),
   },
   rentals: {
     getAll: () => apiClient.get('/api/admin/rental'),
     getOverdue: () => apiClient.get('/api/admin/rental/overdue'),
-    getById: (id) => apiClient.get(`/api/admin/rental/${id}`),
-    return: (id, returnDate) => apiClient.put(`/api/admin/rental/${id}/return`, { return_date: returnDate }),
+    getById: (id: number) => apiClient.get(`/api/admin/rental/${id}`),
+    return: (id: number, returnDate: string) => apiClient.put(`/api/admin/rental/${id}/return`, { return_date: returnDate }),
   },
   testimonials: {
-    delete: (id) => apiClient.delete(`/api/admin/testimonial/${id}`),
+    delete: (id: number) => apiClient.delete(`/api/admin/testimonial/${id}`),
   },
 };
 

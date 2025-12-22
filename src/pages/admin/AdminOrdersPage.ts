@@ -5,6 +5,7 @@ import { formatCurrency, formatDate, isAdmin } from '../../js/utils/helpers.js';
 
 export async function AdminOrdersPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = EmptyState('Akses Ditolak', 'Anda harus admin untuk mengakses halaman ini', 'Kembali', '/');
@@ -68,17 +69,21 @@ async function loadAdminOrders() {
     let orders = Array.isArray(response?.data?.data) ? response.data.data : (Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []));
 
     if (!Array.isArray(orders) || orders.length === 0) {
-      document.getElementById('orders-list').innerHTML = `<div class="p-8">${EmptyState('Tidak Ada Pesanan', '')}</div>`;
+      const ordersListEl = document.getElementById('orders-list');
+      if (ordersListEl) ordersListEl.innerHTML = `<div class="p-8">${EmptyState('Tidak Ada Pesanan', '')}</div>`;
       return;
     }
 
-    const renderTable = (items) => {
+    const renderTable = (items: any[]) => {
       if (items.length === 0) {
-        document.getElementById('orders-list').innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada pesanan yang sesuai dengan filter</div>`;
+        const ordersListEmpty = document.getElementById('orders-list');
+        if (ordersListEmpty) ordersListEmpty.innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada pesanan yang sesuai dengan filter</div>`;
         return;
       }
 
       const container = document.getElementById('orders-list');
+      if (!container) return;
+
       container.innerHTML = `
         <table class="w-full">
           <thead class="bg-neutral-100 border-b border-neutral-200">
@@ -91,7 +96,7 @@ async function loadAdminOrders() {
             </tr>
           </thead>
           <tbody>
-            ${items.map(order => `
+            ${items.map((order: any) => `
               <tr class="border-b border-neutral-200 hover:bg-neutral-50">
                 <td class="px-6 py-3 font-bold">${order.order_code}</td>
                 <td class="px-6 py-3">${formatDate(order.start_date)}</td>
@@ -111,15 +116,16 @@ async function loadAdminOrders() {
 
     renderTable(orders);
 
-    const searchInput = document.getElementById('order-search');
-    const statusFilter = document.getElementById('order-status-filter');
+    const searchInput = document.getElementById('order-search') as HTMLInputElement | null;
+    const statusFilter = document.getElementById('order-status-filter') as HTMLSelectElement | null;
 
     const applyFilters = () => {
+      if (!searchInput || !statusFilter) return;
       const searchText = searchInput.value.toLowerCase();
       const selectedStatus = statusFilter.value;
 
-      let filtered = orders.filter(order => {
-        const matchesSearch = order.order_code.toLowerCase().includes(searchText);
+      let filtered = orders.filter((order: any) => {
+        const matchesSearch = (order.order_code || '').toLowerCase().includes(searchText);
         const matchesStatus = !selectedStatus || order.status === selectedStatus;
         return matchesSearch && matchesStatus;
       });
@@ -127,10 +133,10 @@ async function loadAdminOrders() {
       renderTable(filtered);
     };
 
-    searchInput.addEventListener('input', applyFilters);
-    statusFilter.addEventListener('change', applyFilters);
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 
-    window.showUpdateStatusModal = (orderId, currentStatus) => {
+    window.showUpdateStatusModal = (orderId: number, currentStatus: string) => {
       let modalContainer = document.getElementById('modal-container');
       if (!modalContainer) {
         modalContainer = document.createElement('div');
@@ -167,7 +173,7 @@ async function loadAdminOrders() {
       modalContainer.innerHTML = modal;
     };
 
-    window.updateOrderStatus = async (orderId, newStatus) => {
+    window.updateOrderStatus = async (orderId: number, newStatus: string) => {
       try {
         await adminAPI.orders.updateStatus(orderId, newStatus);
         showAlertModal(`Pesanan berhasil diubah menjadi ${newStatus}`, true);
@@ -178,6 +184,7 @@ async function loadAdminOrders() {
     };
   } catch (error) {
     console.error('Error loading admin orders:', error);
-    document.getElementById('orders-list').innerHTML = ErrorMessage('Gagal memuat data pesanan');
+    const ordersListEl = document.getElementById('orders-list');
+    if (ordersListEl) ordersListEl.innerHTML = ErrorMessage('Gagal memuat data pesanan');
   }
 }

@@ -5,6 +5,7 @@ import { showNotification, isAuthenticated } from '../../js/utils/helpers.js';
 
 export async function ProfilePage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAuthenticated()) {
     window.location.href = '/login';
@@ -231,35 +232,37 @@ async function loadProfile() {
     localStorage.setItem('user', JSON.stringify(updatedUser));
 
     // Check verification status and show alert if needed
-    const verificationAlert = document.getElementById('verification-alert');
+    const verificationAlert = document.getElementById('verification-alert') as HTMLElement | null;
     if (!profile.isverified) {
-      verificationAlert.classList.remove('hidden');
+      if (verificationAlert) verificationAlert.classList.remove('hidden');
     } else {
-      verificationAlert.classList.add('hidden');
+      if (verificationAlert) verificationAlert.classList.add('hidden');
     }
 
     // Check penalty status and show warning if needed
-    const penaltyWarning = document.getElementById('penalty-warning');
-    const penaltyMessage = document.getElementById('penalty-message');
+    const penaltyWarning = document.getElementById('penalty-warning') as HTMLElement | null;
+    const penaltyMessage = document.getElementById('penalty-message') as HTMLElement | null;
     if (profile.penalty_info?.has_penalty) {
-      penaltyWarning.classList.remove('hidden');
-      penaltyMessage.textContent = profile.penalty_info.warning;
+      if (penaltyWarning) penaltyWarning.classList.remove('hidden');
+      if (penaltyMessage) penaltyMessage.textContent = profile.penalty_info.warning;
     } else {
-      penaltyWarning.classList.add('hidden');
+      if (penaltyWarning) penaltyWarning.classList.add('hidden');
     }
 
     // Update profile photo
-    const profilePhoto = document.getElementById('profile-photo');
+    const profilePhoto = document.getElementById('profile-photo') as HTMLImageElement | null;
     const defaultPhoto = 'https://i.pinimg.com/736x/9d/16/4e/9d164e4e074d11ce4de0a508914537a8.jpg';
 
-    if (profile.profile) {
-      profilePhoto.src = profile.profile;
-      // Handle image load error
-      profilePhoto.onerror = function() {
-        this.src = defaultPhoto;
-      };
-    } else {
-      profilePhoto.src = defaultPhoto;
+    if (profilePhoto) {
+      if (profile.profile) {
+        profilePhoto.src = profile.profile;
+        // Handle image load error
+        profilePhoto.onerror = function() {
+          (this as HTMLImageElement).src = defaultPhoto;
+        };
+      } else {
+        profilePhoto.src = defaultPhoto;
+      }
     }
 
     // Update username in heading
@@ -271,7 +274,9 @@ async function loadProfile() {
     // Update navbar profile photo
     updateNavbarProfilePhoto();
 
-    document.getElementById('profile-info').innerHTML = `
+    const profileInfoEl = document.getElementById('profile-info') as HTMLElement | null;
+    if (profileInfoEl) {
+      profileInfoEl.innerHTML = `
       <div class='space-y-6'>
         <div class='grid grid-cols-1 md:grid-cols-2 gap-6'>
           <div>
@@ -309,43 +314,50 @@ async function loadProfile() {
         </div>
       </div>
     `;
+    }
 
     // Fill edit form with current data
-    document.getElementById('name').value = profile.name || '';
-    document.getElementById('email').value = profile.email || '';
-    document.getElementById('phone').value = profile.phone || '';
-    document.getElementById('nik').value = profile.nik || '';
+    const nameInput = document.getElementById('name') as HTMLInputElement | null;
+    const emailInput = document.getElementById('email') as HTMLInputElement | null;
+    const phoneInput = document.getElementById('phone') as HTMLInputElement | null;
+    const nikInput = document.getElementById('nik') as HTMLInputElement | null;
+
+    if (nameInput) nameInput.value = profile.name || '';
+    if (emailInput) emailInput.value = profile.email || '';
+    if (phoneInput) phoneInput.value = profile.phone || '';
+    if (nikInput) nikInput.value = profile.nik || ''; 
 
   } catch (error) {
     console.error('Error loading profile:', error);
-    document.getElementById('profile-info').innerHTML = ErrorMessage(
-      'Gagal memuat profil. Silakan coba lagi.'
-    );
+    const profileInfoEl = document.getElementById('profile-info') as HTMLElement | null;
+    if (profileInfoEl) {
+      profileInfoEl.innerHTML = ErrorMessage(
+        'Gagal memuat profil. Silakan coba lagi.'
+      );
+    }
   }
 }
 
 function setupPhotoUploadHandlers() {
-  const fileInput = document.getElementById('profile-photo-input');
-  const cameraBtn = document.querySelector('button[title="Ubah Foto"]');
+  const fileInput = document.getElementById('profile-photo-input') as HTMLInputElement | null;
+  const cameraBtn = document.querySelector('button[title="Ubah Foto"]') as HTMLButtonElement | null;
 
   if (cameraBtn) {
     cameraBtn.addEventListener('click', function() {
-      const currentFileInput = document.getElementById('profile-photo-input');
-      if (currentFileInput) {
-        currentFileInput.click();
-      }
+      if (fileInput) fileInput.click();
     });
   }
 
   if (fileInput) {
-    fileInput.addEventListener('change', async function(e) {
-      const file = e.target.files[0];
+    fileInput.addEventListener('change', async function(e: Event) {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
       if (file) {
         // Validate file type
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
         if (!allowedTypes.includes(file.type)) {
           showNotification('Format file tidak didukung. Gunakan JPEG, JPG, atau PNG.', 'error');
-          this.value = '';
+          target.value = '';
           return;
         }
 
@@ -353,7 +365,7 @@ function setupPhotoUploadHandlers() {
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
           showNotification('Ukuran file terlalu besar. Maksimal 5MB.', 'error');
-          this.value = '';
+          target.value = '';
           return;
         }
 
@@ -362,13 +374,13 @@ function setupPhotoUploadHandlers() {
       }
     });
   }
-}
+} 
 
-async function uploadProfilePhoto(file) {
-  const fileInput = document.getElementById('profile-photo-input');
+async function uploadProfilePhoto(file: File) {
+  const fileInput = document.getElementById('profile-photo-input') as HTMLInputElement | null;
 
   // Show loading state on camera button
-  const cameraBtn = document.querySelector('button[title="Ubah Foto"]');
+  const cameraBtn = document.querySelector('button[title="Ubah Foto"]') as HTMLButtonElement | null;
   if (cameraBtn) {
     cameraBtn.disabled = true;
     cameraBtn.innerHTML = `
@@ -393,8 +405,9 @@ async function uploadProfilePhoto(file) {
     
   } catch (error) {
     console.error('Error uploading profile photo:', error);
+    const err = error as any;
     showNotification(
-      error.response?.data?.message || 'Gagal mengupload foto profil',
+      err.response?.data?.message || 'Gagal mengupload foto profil',
       'error'
     );
   } finally {
@@ -408,21 +421,21 @@ async function uploadProfilePhoto(file) {
       `;
     }
   }
-}
+} 
 
 
 function setupFormHandlers() {
-  const form = document.getElementById('profile-form');
+  const form = document.getElementById('profile-form') as HTMLFormElement | null;
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const formData = new FormData(form);
       const data = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        nik: formData.get('nik')
+        name: String(formData.get('name') ?? ''),
+        email: String(formData.get('email') ?? ''),
+        phone: String(formData.get('phone') ?? ''),
+        nik: String(formData.get('nik') ?? '')
       };
 
       try {
@@ -433,28 +446,35 @@ function setupFormHandlers() {
         await loadProfile();
 
         // Hide edit form and show profile info
-        document.getElementById('edit-profile-form').classList.add('hidden');
-        document.getElementById('profile-info').parentElement.classList.remove('hidden');
+        const editForm = document.getElementById('edit-profile-form');
+        const profileInfoEl = document.getElementById('profile-info');
+        if (editForm) editForm.classList.add('hidden');
+        if (profileInfoEl && profileInfoEl.parentElement) profileInfoEl.parentElement.classList.remove('hidden');
 
       } catch (error) {
         console.error('Error updating profile:', error);
+        const err = error as any;
         showNotification(
-          error.response?.data?.message || 'Gagal memperbarui profil',
+          err.response?.data?.message || 'Gagal memperbarui profil',
           'error'
         );
       }
     });
   }
-}
+} 
 
 function showEditForm() {
-  document.getElementById('profile-info').parentElement.classList.add('hidden');
-  document.getElementById('edit-profile-form').classList.remove('hidden');
+  const profileInfoEl = document.getElementById('profile-info');
+  const editForm = document.getElementById('edit-profile-form');
+  if (profileInfoEl && profileInfoEl.parentElement) profileInfoEl.parentElement.classList.add('hidden');
+  if (editForm) editForm.classList.remove('hidden');
 }
 
 function cancelEdit() {
-  document.getElementById('edit-profile-form').classList.add('hidden');
-  document.getElementById('profile-info').parentElement.classList.remove('hidden');
+  const profileInfoEl = document.getElementById('profile-info');
+  const editForm = document.getElementById('edit-profile-form');
+  if (editForm) editForm.classList.add('hidden');
+  if (profileInfoEl && profileInfoEl.parentElement) profileInfoEl.parentElement.classList.remove('hidden');
 }
 
 // Make functions global so they can be called from onclick

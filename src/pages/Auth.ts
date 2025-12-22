@@ -5,6 +5,7 @@ import { setAuthData, validateEmail, validatePhone, validateNIK, validatePasswor
 
 export function LoginPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}
@@ -80,32 +81,37 @@ export function LoginPage() {
     ${Footer()}
   `;
 
-  document.getElementById('login-form').addEventListener('submit', handleLogin);
+  const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
+  if (loginForm) loginForm.addEventListener('submit', handleLogin);
 
   // Toggle password visibility
-  const togglePassword = document.getElementById('toggle-password');
-  const passwordInput = document.getElementById('password');
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    togglePassword.innerHTML = type === 'password' 
-      ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-        </svg>`
-      : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-        </svg>`;
-  });
+  const togglePassword = document.getElementById('toggle-password') as HTMLButtonElement | null;
+  const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+  if (togglePassword && passwordInput) {
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePassword.innerHTML = type === 'password' 
+        ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>`
+        : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+          </svg>`;
+    });
+  }
 }
 
-async function handleLogin(e) {
+async function handleLogin(e: Event) {
   e.preventDefault();
 
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const errorDiv = document.getElementById('login-error');
-  const form = document.getElementById('login-form');
+  const usernameInput = document.getElementById('username') as HTMLInputElement | null;
+  const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+  const username = usernameInput?.value ?? '';
+  const password = passwordInput?.value ?? '';
+  const errorDiv = document.getElementById('login-error') as HTMLElement | null;
+  const form = document.getElementById('login-form') as HTMLFormElement | null; 
 
   try {
     const response = await authAPI.login({ username, password });
@@ -125,32 +131,38 @@ async function handleLogin(e) {
   } catch (error) {
     // Customize error message
     let message = 'Username atau password salah';
-    if (error.response?.status === 401) {
+    if ((error as any).response?.status === 401) {
       message = 'Username atau password salah';
-    } else if (error.response?.data?.message) {
-      message = error.response.data.message;
+    } else if ((error as any).response?.data?.message) {
+      message = (error as any).response.data.message;
     }
     
     // Show error in form
-    errorDiv.classList.remove('hidden');
-    errorDiv.querySelector('p').textContent = message;
+    if (errorDiv) {
+      errorDiv.classList.remove('hidden');
+      const p = errorDiv.querySelector('p');
+      if (p) p.textContent = message;
+    }
     
     // Add shake animation
-    form.style.animation = 'none';
-    setTimeout(() => {
-      form.style.animation = 'shake 0.5s ease-in-out';
-    }, 10);
+    if (form) {
+      form.style.animation = 'none';
+      setTimeout(() => {
+        if (form) form.style.animation = 'shake 0.5s ease-in-out';
+      }, 10);
+    }
     
     // Clear error after 5 seconds
     setTimeout(() => {
-      errorDiv.classList.add('hidden');
-      form.style.animation = 'none';
+      if (errorDiv) errorDiv.classList.add('hidden');
+      if (form) form.style.animation = 'none';
     }, 5000);
   }
 }
 
 export function RegisterPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}
@@ -278,51 +290,56 @@ export function RegisterPage() {
     ${Footer()}
   `;
 
-  document.getElementById('register-form').addEventListener('submit', handleRegister);
+  const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
+  if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
   // Toggle password visibility for password field
-  const togglePasswordRegister = document.getElementById('toggle-password-register');
-  const passwordInputRegister = document.getElementById('password');
-  togglePasswordRegister.addEventListener('click', () => {
-    const type = passwordInputRegister.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInputRegister.setAttribute('type', type);
-    togglePasswordRegister.innerHTML = type === 'password' 
-      ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-        </svg>`
-      : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-        </svg>`;
-  });
+  const togglePasswordRegister = document.getElementById('toggle-password-register') as HTMLButtonElement | null;
+  const passwordInputRegister = document.getElementById('password') as HTMLInputElement | null;
+  if (togglePasswordRegister && passwordInputRegister) {
+    togglePasswordRegister.addEventListener('click', () => {
+      const type = passwordInputRegister.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInputRegister.setAttribute('type', type);
+      togglePasswordRegister.innerHTML = type === 'password' 
+        ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>`
+        : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+          </svg>`;
+    });
+  }
 
   // Toggle password visibility for confirm password field
-  const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
-  const confirmPasswordInput = document.getElementById('confirm-password');
-  toggleConfirmPassword.addEventListener('click', () => {
-    const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    confirmPasswordInput.setAttribute('type', type);
-    toggleConfirmPassword.innerHTML = type === 'password' 
-      ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-        </svg>`
-      : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-        </svg>`;
-  });
+  const toggleConfirmPassword = document.getElementById('toggle-confirm-password') as HTMLButtonElement | null;
+  const confirmPasswordInput = document.getElementById('confirm-password') as HTMLInputElement | null;
+  if (toggleConfirmPassword && confirmPasswordInput) {
+    toggleConfirmPassword.addEventListener('click', () => {
+      const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      confirmPasswordInput.setAttribute('type', type);
+      toggleConfirmPassword.innerHTML = type === 'password' 
+        ? `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>`
+        : `<svg class="w-5 h-5 text-neutral-400 hover:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+          </svg>`;
+    });
+  }
 }
 
-async function handleRegister(e) {
+async function handleRegister(e: Event) {
   e.preventDefault();
 
-  const name = document.getElementById('name').value;
-  const username = document.getElementById('username').value;
-  const email = document.getElementById('email').value;
-  let phone = document.getElementById('phone').value;
-  let nik = document.getElementById('nik').value;
-  const password = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirm-password').value;
+  const name = (document.getElementById('name') as HTMLInputElement | null)?.value ?? '';
+  const username = (document.getElementById('username') as HTMLInputElement | null)?.value ?? '';
+  const email = (document.getElementById('email') as HTMLInputElement | null)?.value ?? '';
+  let phone = (document.getElementById('phone') as HTMLInputElement | null)?.value ?? '';
+  let nik = (document.getElementById('nik') as HTMLInputElement | null)?.value ?? '';
+  const password = (document.getElementById('password') as HTMLInputElement | null)?.value ?? '';
+  const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement | null)?.value ?? '';
 
   if (!validateUsername(username)) {
     showAlertModal('Username harus 3-20 karakter, hanya huruf, angka, dan underscore', false);
@@ -386,11 +403,11 @@ async function handleRegister(e) {
   } catch (error) {
     let message = 'Pendaftaran gagal. Silakan coba lagi';
 
-    if (error.response?.status === 500) {
+    if ((error as any).response?.status === 500) {
       // Jika server error tapi data mungkin sudah masuk, beri pesan khusus
       message = 'Terjadi kesalahan server. Silakan coba login dengan akun yang baru didaftarkan.';
-    } else if (error.response?.status === 400 && error.response?.data?.message) {
-      const errorMessage = error.response.data.message.toLowerCase();
+    } else if ((error as any).response?.status === 400 && (error as any).response?.data?.message) {
+      const errorMessage = (error as any).response.data.message.toLowerCase();
 
       if (errorMessage.includes('username') && errorMessage.includes('sudah')) {
         message = 'Username sudah digunakan. Silakan pilih username lain.';
@@ -401,10 +418,10 @@ async function handleRegister(e) {
       } else if (errorMessage.includes('nik') && errorMessage.includes('sudah')) {
         message = 'NIK sudah terdaftar. Silakan gunakan NIK lain.';
       } else {
-        message = error.response.data.message;
+        message = (error as any).response.data.message;
       }
-    } else if (error.response?.data?.message) {
-      message = error.response.data.message;
+    } else if ((error as any).response?.data?.message) {
+      message = (error as any).response.data.message;
     }
 
     showAlertModal(message, false);

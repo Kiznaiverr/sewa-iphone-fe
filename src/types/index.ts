@@ -134,7 +134,24 @@ export interface Rental {
   status: 'active' | 'returned' | 'overdue';
   penalty: number;
 }
-
+// Admin view of rental may include additional expanded fields from the API
+export interface AdminRental extends Rental {
+  iphone_name?: string;
+  user_name?: string;
+  user_email?: string;
+  user_phone?: string;
+  profile?: string;
+  order_code?: string;
+  rental_start_date?: string; // formatted keys used by server
+  rental_end_date?: string;
+  days_overdue?: number;
+  price_per_day?: number | string;
+  penalty_per_day?: number | string;
+  total_penalty?: number | string;
+  order_total?: number | string;
+  created_at?: string;
+  actual_return_date?: string;
+}
 export interface ReturnRentalRequest {
   return_date: string;
 }
@@ -151,6 +168,13 @@ export interface Testimonial {
   content: string;
   rating: number;
   created_at: string;
+}
+
+// Admin view of testimonial data may include extra fields
+export interface AdminTestimonial extends Testimonial {
+  user_name?: string;
+  profile?: string;
+  message?: string; // some APIs return `message` instead of `content`
 }
 
 // Router Types
