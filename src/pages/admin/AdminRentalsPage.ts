@@ -1,10 +1,11 @@
 import { Sidebar } from '../../components/layout/Layout.js';
-import { LoadingSpinner, ErrorMessage, EmptyState, showAlertModal, closeModal } from '../../components/common/index.js';
+import { LoadingSpinner, ErrorMessage, EmptyState, showAlertModal } from '../../components/common/index.js';
 import { adminAPI } from '../../js/api/endpoints.js';
 import { formatDate, isAdmin } from '../../js/utils/helpers.js';
 
 export async function AdminRentalsPage() {
-  const app = document.getElementById('app');
+  const app = document.getElementById('app') as HTMLElement | null;
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = EmptyState('Akses Ditolak', 'Anda harus admin untuk mengakses halaman ini', 'Kembali', '/');
@@ -65,8 +66,12 @@ async function loadAdminRentals() {
       ? (Array.isArray(overdueRes.value?.data?.data) ? overdueRes.value.data.data : (Array.isArray(overdueRes.value?.data) ? overdueRes.value.data : (Array.isArray(overdueRes.value) ? overdueRes.value : [])))
       : [];
 
-    const renderRentals = (activeItems, overdueItems) => {
-      const activeHtml = activeItems.length > 0 ? activeItems.map(rental => `
+    // Treat these as admin-expanded Rental objects
+    const activeRentalsAdmin: import('../../types').AdminRental[] = activeRentals as any;
+    const overdueRentalsAdmin: import('../../types').AdminRental[] = overdueRentals as any;
+
+    const renderRentals = (activeItems: import('../../types').AdminRental[], overdueItems: import('../../types').AdminRental[]) => {
+      const activeHtml = activeItems.length > 0 ? activeItems.map((rental: import('../../types').AdminRental) => `
         <div class="py-3 border-b border-neutral-200">
           <div class="flex-between mb-2">
             <p class="font-bold">ID: ${rental.id}</p>
@@ -79,7 +84,7 @@ async function loadAdminRentals() {
         </div>
       `).join('') : '<p class="text-neutral-500">Tidak ada rental aktif yang sesuai</p>';
 
-      const overdueHtml = overdueItems.length > 0 ? overdueItems.map(rental => `
+      const overdueHtml = overdueItems.length > 0 ? overdueItems.map((rental: import('../../types').AdminRental) => `
         <div class="py-4 border-b border-neutral-200 hover:bg-neutral-50 transition-colors">
           <div class="flex-between mb-3">
             <div>
@@ -125,26 +130,29 @@ async function loadAdminRentals() {
         </div>
       `).join('') : '<p class="text-neutral-500">Tidak ada rental overdue yang sesuai</p>';
 
-      document.getElementById('active-rentals').innerHTML = activeHtml;
-      document.getElementById('overdue-rentals').innerHTML = overdueHtml;
+      const activeEl = document.getElementById('active-rentals') as HTMLElement | null;
+      const overdueEl = document.getElementById('overdue-rentals') as HTMLElement | null;
+      if (activeEl) activeEl.innerHTML = activeHtml;
+      if (overdueEl) overdueEl.innerHTML = overdueHtml;
     };
 
-    renderRentals(activeRentals, overdueRentals);
+    renderRentals(activeRentalsAdmin, overdueRentalsAdmin);
 
     // Store overdue rentals data globally for detail modal
-    window.overdueRentalsData = overdueRentals;
+    (window as any).overdueRentalsData = overdueRentalsAdmin;
 
-    const searchInput = document.getElementById('rental-search');
+    const searchInput = document.getElementById('rental-search') as HTMLInputElement | null;
 
     const applySearch = () => {
+      if (!searchInput) return;
       const searchText = searchInput.value.toLowerCase();
 
-      const filteredActive = activeRentals.filter(rental =>
+      const filteredActive = activeRentals.filter((rental: import('../../types').Rental) =>
         rental.id.toString().includes(searchText) ||
         (rental.user_name || '').toLowerCase().includes(searchText)
       );
 
-      const filteredOverdue = overdueRentals.filter(rental =>
+      const filteredOverdue = overdueRentals.filter((rental: import('../../types').Rental) =>
         rental.id.toString().includes(searchText) ||
         (rental.user_name || '').toLowerCase().includes(searchText)
       );
@@ -152,9 +160,9 @@ async function loadAdminRentals() {
       renderRentals(filteredActive, filteredOverdue);
     };
 
-    searchInput.addEventListener('input', applySearch);
+    if (searchInput) searchInput.addEventListener('input', applySearch);
 
-    window.returnRental = async (rentalId) => {
+    (window as any).returnRental = async (rentalId: number) => {
       const today = new Date().toISOString().split('T')[0];
       try {
         await adminAPI.rentals.return(rentalId, today);
@@ -166,8 +174,8 @@ async function loadAdminRentals() {
       }
     };
 
-    window.showOverdueDetail = (rentalId) => {
-      const rental = window.overdueRentalsData.find(r => r.id === rentalId);
+    (window as any).showOverdueDetail = (rentalId: number) => {
+      const rental = (window as any).overdueRentalsData.find((r: any) => r.id === rentalId);
       if (!rental) return;
 
       const modalContent = `
@@ -312,7 +320,9 @@ async function loadAdminRentals() {
     };
   } catch (error) {
     console.error('Error loading admin rentals:', error);
-    document.getElementById('active-rentals').innerHTML = ErrorMessage('Gagal memuat data rental');
-    document.getElementById('overdue-rentals').innerHTML = ErrorMessage('Gagal memuat data overdue');
+    const activeEl = document.getElementById('active-rentals');
+    const overdueEl = document.getElementById('overdue-rentals');
+    if (activeEl) activeEl.innerHTML = ErrorMessage('Gagal memuat data rental');
+    if (overdueEl) overdueEl.innerHTML = ErrorMessage('Gagal memuat data overdue');
   }
 }

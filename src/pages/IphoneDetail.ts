@@ -22,14 +22,15 @@ export async function IphoneDetailPage(id: string) {
 
 async function loadIphoneDetail(id: string) {
   try {
-    const response = await iphoneAPI.getById(id);
+    const response = await iphoneAPI.getById(Number(id));
     const iphone = response.data.data;
     
     // Handle images - could be string or array
     const imageUrl = iphone.images && typeof iphone.images === 'string' ? iphone.images : null;
     const images = Array.isArray(iphone.images) ? iphone.images : (imageUrl ? [imageUrl] : []);
 
-    const container = document.getElementById('detail-container');
+    const container = document.getElementById('detail-container') as HTMLElement | null;
+    if (!container) return;
     container.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
@@ -90,24 +91,31 @@ async function loadIphoneDetail(id: string) {
     `;
 
     if (localStorage.getItem('token')) {
-      const startDateInput = document.getElementById('start-date');
-      const endDateInput = document.getElementById('end-date');
+      const startDateInput = document.getElementById('start-date') as HTMLInputElement | null;
+      const endDateInput = document.getElementById('end-date') as HTMLInputElement | null;
+      const durationEl = document.getElementById('duration') as HTMLElement | null;
+      const totalPriceEl = document.getElementById('total-price') as HTMLElement | null;
 
-      [startDateInput, endDateInput].forEach(input => {
-        input.addEventListener('change', () => {
-          if (startDateInput.value && endDateInput.value) {
-            const days = calculateDays(startDateInput.value, endDateInput.value);
+      if (startDateInput && endDateInput) {
+        const onDateChange = () => {
+          const startVal = startDateInput.value;
+          const endVal = endDateInput.value;
+          if (startVal && endVal) {
+            const days = calculateDays(startVal, endVal);
             const totalPrice = calculateTotalPrice(iphone.price_per_day, days);
 
-            document.getElementById('duration').textContent = `${days} hari`;
-            document.getElementById('total-price').textContent = formatCurrency(totalPrice);
+            if (durationEl) durationEl.textContent = `${days} hari`;
+            if (totalPriceEl) totalPriceEl.textContent = formatCurrency(totalPrice);
           }
-        });
-      });
+        };
 
-      window.submitOrder = async (iphoneId) => {
-        const startDate = startDateInput.value;
-        const endDate = endDateInput.value;
+        startDateInput.addEventListener('change', onDateChange);
+        endDateInput.addEventListener('change', onDateChange);
+      }
+
+      (window as any).submitOrder = async (iphoneId: number) => {
+        const startDate = startDateInput?.value ?? '';
+        const endDate = endDateInput?.value ?? '';
 
         if (!startDate || !endDate) {
           showNotification('Silakan pilih tanggal mulai dan kembali', 'warning');
@@ -139,11 +147,12 @@ async function loadIphoneDetail(id: string) {
           });
 
           showOrderSuccessModal();
-        } catch (error) {
+        } catch (err) {
+          const error = err as any;
           const errorMessage = error.response?.data?.message || 'Gagal membuat pesanan';
           
           // Check if error is related to overdue rentals/penalty
-          if (errorMessage.includes('overdue') || errorMessage.includes('penalty') || errorMessage.includes('outstanding penalties')) {
+          if (typeof errorMessage === 'string' && (errorMessage.includes('overdue') || errorMessage.includes('penalty') || errorMessage.includes('outstanding penalties'))) {
             showNotification('Anda memiliki penyewaan yang terlambat. Silakan selesaikan denda terlebih dahulu.', 'error');
             setTimeout(() => {
               window.location.href = '/rentals';

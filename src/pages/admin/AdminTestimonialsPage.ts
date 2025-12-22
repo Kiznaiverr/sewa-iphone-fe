@@ -4,7 +4,8 @@ import { testimonialAPI, adminAPI } from '../../js/api/endpoints.js';
 import { isAdmin } from '../../js/utils/helpers.js';
 
 export async function AdminTestimonialsPage() {
-  const app = document.getElementById('app');
+  const app = document.getElementById('app') as HTMLElement | null;
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = EmptyState('Akses Ditolak', 'Anda harus admin untuk mengakses halaman ini', 'Kembali', '/');
@@ -48,18 +49,20 @@ async function loadAdminTestimonials() {
     const response = await testimonialAPI.getAll();
     const testimonials = response.data.data;
 
+    const testimonialsListEl = document.getElementById('testimonials-list') as HTMLElement | null;
     if (!Array.isArray(testimonials) || testimonials.length === 0) {
-      document.getElementById('testimonials-list').innerHTML = `<div class="p-8">${EmptyState('Tidak Ada Testimoni', 'Belum ada testimoni yang diberikan pengguna')}</div>`;
+      if (testimonialsListEl) testimonialsListEl.innerHTML = `<div class="p-8">${EmptyState('Tidak Ada Testimoni', 'Belum ada testimoni yang diberikan pengguna')}</div>`;
       return;
     }
 
-    const renderTable = (items) => {
+    const renderTable = (items: import('../../types').AdminTestimonial[]) => {
       if (items.length === 0) {
-        document.getElementById('testimonials-list').innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada testimoni yang sesuai dengan pencarian</div>`;
+        if (testimonialsListEl) testimonialsListEl.innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada testimoni yang sesuai dengan pencarian</div>`;
         return;
       }
 
-      const container = document.getElementById('testimonials-list');
+      const container = testimonialsListEl;
+      if (!container) return;
       container.innerHTML = `
         <table class="w-full">
           <thead class="bg-neutral-100 border-b border-neutral-200">
@@ -116,31 +119,33 @@ async function loadAdminTestimonials() {
 
     renderTable(testimonials);
 
-    const searchInput = document.getElementById('testimonial-search');
+    const searchInput = document.getElementById('testimonial-search') as HTMLInputElement | null;
 
     const applySearch = () => {
+      if (!searchInput) return;
       const searchText = searchInput.value.toLowerCase();
 
-      let filtered = testimonials.filter(testimonial => {
+      let filtered = testimonials.filter((testimonial: import('../../types').AdminTestimonial) => {
+        const text = (testimonial.message ?? testimonial.content ?? '').toString();
         const matchesSearch = (testimonial.user_name || '').toLowerCase().includes(searchText) ||
-                            (testimonial.message || '').toLowerCase().includes(searchText);
+                            text.toLowerCase().includes(searchText);
         return matchesSearch;
       });
 
       renderTable(filtered);
     };
 
-    searchInput.addEventListener('input', applySearch);
+    if (searchInput) searchInput.addEventListener('input', applySearch);
 
-    window.deleteTestimonial = async (testimonialId) => {
+    (window as any).deleteTestimonial = async (testimonialId: number) => {
       // Set up the callback for actual deletion
-      window.__deleteTestimonialCallback = async (id) => {
+      (window as any).__deleteTestimonialCallback = async (id: number) => {
         try {
           await adminAPI.testimonials.delete(id);
           showAlertModal('Testimoni berhasil dihapus!', true);
-          loadAdminTestimonials();
-        } catch (error) {
-          console.error('Error deleting testimonial:', error);
+          await loadAdminTestimonials();
+        } catch (err) {
+          console.error('Error deleting testimonial:', err);
           showAlertModal('Gagal menghapus testimoni', false);
         }
       };

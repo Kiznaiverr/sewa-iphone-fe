@@ -5,6 +5,7 @@ import { formatCurrency, isAdmin } from '../../js/utils/helpers.js';
 
 export async function AdminIphonesPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = EmptyState('Akses Ditolak', 'Anda harus admin untuk mengakses halaman ini', 'Kembali', '/');
@@ -69,20 +70,25 @@ export async function AdminIphonesPage() {
 async function loadAdminIphones() {
   try {
     const response = await adminAPI.iphones.getAll();
-    let iphones = response.data.data;
+    const responseAny = response as any;
+    let iphones = Array.isArray(responseAny?.data?.data) ? responseAny.data.data : (Array.isArray(responseAny?.data) ? responseAny.data : (Array.isArray(responseAny) ? responseAny : []));
 
     if (!Array.isArray(iphones) || iphones.length === 0) {
-      document.getElementById('iphones-list').innerHTML = `<div class="p-8">${EmptyState('Tidak Ada iPhone', 'Tambahkan iPhone baru')}</div>`;
+      const iphonesListEl = document.getElementById('iphones-list');
+      if (iphonesListEl) iphonesListEl.innerHTML = `<div class="p-8">${EmptyState('Tidak Ada iPhone', 'Tambahkan iPhone baru')}</div>`;
       return;
     }
 
-    const renderTable = (items) => {
+    const renderTable = (items: any[]) => {
       if (items.length === 0) {
-        document.getElementById('iphones-list').innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada iPhone yang sesuai dengan filter</div>`;
+        const emptyEl = document.getElementById('iphones-list');
+        if (emptyEl) emptyEl.innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada iPhone yang sesuai dengan filter</div>`;
         return;
       }
 
       const container = document.getElementById('iphones-list');
+      if (!container) return;
+
       container.innerHTML = `
         <table class="w-full">
           <thead class="bg-neutral-100 border-b border-neutral-200">
@@ -95,7 +101,7 @@ async function loadAdminIphones() {
             </tr>
           </thead>
           <tbody>
-            ${items.map(iphone => `
+            ${items.map((iphone: any) => `
               <tr class="border-b border-neutral-200 hover:bg-neutral-50">
                 <td class="px-6 py-3">${iphone.name}</td>
                 <td class="px-6 py-3">${formatCurrency(iphone.price_per_day)}</td>
@@ -116,15 +122,16 @@ async function loadAdminIphones() {
 
     renderTable(iphones);
 
-    const searchInput = document.getElementById('iphone-search');
-    const statusFilter = document.getElementById('iphone-status-filter');
+    const searchInput = document.getElementById('iphone-search') as HTMLInputElement | null;
+    const statusFilter = document.getElementById('iphone-status-filter') as HTMLSelectElement | null;
 
     const applyFilters = () => {
+      if (!searchInput || !statusFilter) return;
       const searchText = searchInput.value.toLowerCase();
       const selectedStatus = statusFilter.value;
 
-      let filtered = iphones.filter(iphone => {
-        const matchesSearch = iphone.name.toLowerCase().includes(searchText);
+      let filtered = iphones.filter((iphone: any) => {
+        const matchesSearch = (iphone.name || '').toLowerCase().includes(searchText);
         const matchesStatus = !selectedStatus || iphone.status === selectedStatus;
         return matchesSearch && matchesStatus;
       });
@@ -132,16 +139,16 @@ async function loadAdminIphones() {
       renderTable(filtered);
     };
 
-    searchInput.addEventListener('input', applyFilters);
-    statusFilter.addEventListener('change', applyFilters);
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 
     // simple HTML escape to avoid injection when inserting values into modal
-    const escapeHtml = (unsafe) => {
+    const escapeHtml = (unsafe: any) => {
       return String(unsafe || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     };
 
-    window.editIphone = (id) => {
-      const iphone = iphones.find(i => i.id === id);
+    (window as any).editIphone = (id: number) => {
+      const iphone = iphones.find((i: any) => i.id === id);
       if (!iphone) return;
 
       const content = `
@@ -183,12 +190,12 @@ async function loadAdminIphones() {
       modalContainer.innerHTML = modalHtml;
 
       // attach save handler globally so inline onclick can call it
-      window.__saveIphoneEdit = async (iphoneId) => {
-        const name = document.getElementById('edit-iphone-name')?.value;
-        const price_per_day = parseFloat(document.getElementById('edit-iphone-price')?.value);
-        const specs = document.getElementById('edit-iphone-specs')?.value;
-        const stock = parseInt(document.getElementById('edit-iphone-stock')?.value);
-        const status = document.getElementById('edit-iphone-status')?.value;
+      (window as any).__saveIphoneEdit = async (iphoneId: number) => {
+        const name = (document.getElementById('edit-iphone-name') as HTMLInputElement | null)?.value || '';
+        const price_per_day = parseFloat((document.getElementById('edit-iphone-price') as HTMLInputElement | null)?.value || '0');
+        const specs = (document.getElementById('edit-iphone-specs') as HTMLTextAreaElement | null)?.value || '';
+        const stock = parseInt((document.getElementById('edit-iphone-stock') as HTMLInputElement | null)?.value || '0');
+        const status = (document.getElementById('edit-iphone-status') as HTMLSelectElement | null)?.value || '';
 
         try {
           await adminAPI.iphones.update(iphoneId, { name, price_per_day, specs, stock, status });
@@ -202,7 +209,7 @@ async function loadAdminIphones() {
       };
     };
 
-    window.deleteIphone = (id) => {
+    (window as any).deleteIphone = (id: number) => {
       showUserActionModal('Hapus iPhone', 'Yakin ingin menghapus iPhone ini? Tindakan ini tidak dapat dibatalkan!', async () => {
         try {
           await adminAPI.iphones.delete(id);
@@ -216,6 +223,7 @@ async function loadAdminIphones() {
     };
   } catch (error) {
     console.error('Error loading admin iphones:', error);
-    document.getElementById('iphones-list').innerHTML = ErrorMessage('Gagal memuat data iPhone');
+    const iphonesListEl = document.getElementById('iphones-list');
+    if (iphonesListEl) iphonesListEl.innerHTML = ErrorMessage('Gagal memuat data iPhone');
   }
 }

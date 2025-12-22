@@ -4,7 +4,8 @@ import { adminAPI } from '../../js/api/endpoints.js';
 import { isAdmin } from '../../js/utils/helpers.js';
 
 export async function AdminUsersPage() {
-  const app = document.getElementById('app');
+  const app = document.getElementById('app') as HTMLElement | null;
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = EmptyState('Akses Ditolak', 'Anda harus admin untuk mengakses halaman ini', 'Kembali', '/');
@@ -69,17 +70,20 @@ async function loadAdminUsers(status = 'active') {
     let users = Array.isArray(response?.data?.data) ? response.data.data : (Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []));
 
     if (!Array.isArray(users) || users.length === 0) {
-      document.getElementById('users-list').innerHTML = `<div class="p-8">${EmptyState('Tidak Ada Pengguna', '')}</div>`;
+      const usersListEl = document.getElementById('users-list');
+      if (usersListEl) usersListEl.innerHTML = `<div class="p-8">${EmptyState('Tidak Ada Pengguna', '')}</div>`;
       return;
     }
 
-    const renderTable = (items) => {
+    const renderTable = (items: import('../../types').User[]) => {
       if (items.length === 0) {
-        document.getElementById('users-list').innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada pengguna yang sesuai dengan filter</div>`;
+        const usersListEl = document.getElementById('users-list');
+        if (usersListEl) usersListEl.innerHTML = `<div class="p-8 text-center text-neutral-500">Tidak ada pengguna yang sesuai dengan filter</div>`;
         return;
       }
 
-      const container = document.getElementById('users-list');
+      const container = document.getElementById('users-list') as HTMLElement | null;
+      if (!container) return;
       container.innerHTML = `
         <table class="w-full">
           <thead class="bg-neutral-100 border-b border-neutral-200">
@@ -121,12 +125,13 @@ async function loadAdminUsers(status = 'active') {
 
     renderTable(users);
 
-    const searchInput = document.getElementById('user-search');
+    const searchInput = document.getElementById('user-search') as HTMLInputElement | null;
 
     const applySearch = () => {
+      if (!searchInput) return;
       const searchText = searchInput.value.toLowerCase();
 
-      let filtered = users.filter(user => {
+      let filtered = users.filter((user: import('../../types').User) => {
         const matchesSearch = (user.name || '').toLowerCase().includes(searchText) ||
                             (user.email || '').toLowerCase().includes(searchText);
         return matchesSearch;
@@ -135,15 +140,15 @@ async function loadAdminUsers(status = 'active') {
       renderTable(filtered);
     };
 
-    searchInput.addEventListener('input', applySearch);
+    if (searchInput) searchInput.addEventListener('input', applySearch);
 
     // simple HTML escape to avoid injection when inserting values into modal
-    const escapeHtml = (unsafe) => {
+    const escapeHtml = (unsafe: unknown) => {
       return String(unsafe || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     };
 
-    window.editUser = (userId) => {
-      const user = users.find(u => u.id === userId);
+    (window as any).editUser = (userId: number) => {
+      const user = users.find((u: import('../../types').User) => u.id === userId);
       if (!user) return;
 
       const content = `
@@ -157,7 +162,7 @@ async function loadAdminUsers(status = 'active') {
 
       const footer = `
         <button onclick="closeModal()" class="px-4 py-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-all duration-200 font-medium">Batal</button>
-        <button onclick="window.__saveUserEdit(${userId})" class="btn btn-primary">Simpan</button>
+        <button onclick="(window as any).__saveUserEdit(${userId})" class="btn btn-primary">Simpan</button>
       `;
 
       const modalHtml = Modal('Edit Pengguna', content, footer);
@@ -172,9 +177,9 @@ async function loadAdminUsers(status = 'active') {
       modalContainer.innerHTML = modalHtml;
 
       // attach save handler globally so inline onclick can call it
-      window.__saveUserEdit = async (id) => {
-        const name = document.getElementById('edit-user-name')?.value;
-        const email = document.getElementById('edit-user-email')?.value;
+      (window as any).__saveUserEdit = async (id: number) => {
+        const name = (document.getElementById('edit-user-name') as HTMLInputElement | null)?.value ?? '';
+        const email = (document.getElementById('edit-user-email') as HTMLInputElement | null)?.value ?? '';
 
         try {
           await adminAPI.users.update(id, { name, email });
@@ -188,7 +193,7 @@ async function loadAdminUsers(status = 'active') {
       };
     };
 
-    window.deleteUser = async (userId, type) => {
+    (window as any).deleteUser = async (userId: number, type: 'soft' | 'hard') => {
       const title = type === 'soft' ? 'Nonaktifkan Pengguna' : 'Hapus Pengguna';
       const message = type === 'soft'
         ? 'Nonaktifkan pengguna ini? Pengguna masih bisa diaktifkan kembali.'

@@ -5,6 +5,7 @@ import { isAdmin } from '../../js/utils/helpers.js';
 
 export async function AdminCreateIphonePage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = EmptyState('Akses Ditolak', 'Anda harus admin untuk mengakses halaman ini', 'Kembali', '/');
@@ -61,25 +62,30 @@ export async function AdminCreateIphonePage() {
     </div>
   `;
 
-  document.getElementById('create-iphone-form').addEventListener('submit', handleCreateIphone);
+  const createForm = document.getElementById('create-iphone-form') as HTMLFormElement | null;
+  if (createForm) createForm.addEventListener('submit', handleCreateIphone);
 }
 
-async function handleCreateIphone(e) {
+async function handleCreateIphone(e: Event) {
   e.preventDefault();
-  
-  const formData = new FormData(e.target);
+  const form = e.target as HTMLFormElement | null;
+  if (!form) return;
+  const formData = new FormData(form);
   
   try {
     await adminAPI.iphones.create(formData);
     showAlertModal('iPhone berhasil ditambahkan!', true);
     setTimeout(() => {
-      const router = window.__router;
+      const router = (window as any).__router;
       router.navigate('/admin/iphones');
     }, 2000);
   } catch (error) {
     console.error('Error creating iPhone:', error);
     const errorDiv = document.getElementById('error-message');
-    errorDiv.textContent = error.response?.data?.message || 'Gagal menambahkan iPhone';
-    errorDiv.classList.remove('hidden');
+    if (errorDiv) {
+      const msg = (error as any)?.response?.data?.message || 'Gagal menambahkan iPhone';
+      errorDiv.textContent = msg;
+      errorDiv.classList.remove('hidden');
+    }
   }
 }

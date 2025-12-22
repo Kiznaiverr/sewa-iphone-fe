@@ -21,7 +21,7 @@ const router = new Router();
 
 window.__router = router;
 
-function handleDynamicRoute(path) {
+function handleDynamicRoute(path: string) {
   const matchedRoute = path.match(/^\/iphones\/(\d+)$/);
   const trackOrderRoute = path.match(/^\/orders\/track\/(.+)$/);
 
@@ -146,20 +146,20 @@ router.setNotFound(() => {
   `;
 });
 
-window.handleLogout = () => {
+(window as any).handleLogout = () => {
   showLogoutConfirmation();
 };
 
 // Make modal functions global
-window.showLogoutConfirmation = showLogoutConfirmation;
-window.closeModal = closeModal;
-window.confirmLogout = confirmLogout;
-window.showOrderSuccessModal = showOrderSuccessModal;
-window.confirmDelete = confirmDelete;
-window.closeAppVersionModal = closeAppVersionModal;
-window.closeNewVersionModal = closeNewVersionModal;
-window.dismissAppAnnouncement = dismissAppAnnouncement;
-window.goToOrders = () => {
+(window as any).showLogoutConfirmation = showLogoutConfirmation;
+(window as any).closeModal = closeModal;
+(window as any).confirmLogout = confirmLogout;
+(window as any).showOrderSuccessModal = showOrderSuccessModal;
+(window as any).confirmDelete = confirmDelete;
+(window as any).closeAppVersionModal = closeAppVersionModal;
+(window as any).closeNewVersionModal = closeNewVersionModal;
+(window as any).dismissAppAnnouncement = dismissAppAnnouncement;
+(window as any).goToOrders = () => {
   router.navigate('/orders');
 };
 
