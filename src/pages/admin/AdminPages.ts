@@ -13,6 +13,7 @@ export { AdminCreateIphonePage } from './AdminCreateIphonePage.js';
 
 export async function AdminDashboardPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   if (!isAdmin()) {
     app.innerHTML = '<div class="container-main section text-center py-20"><p>Akses Ditolak</p></div>';

@@ -79,7 +79,7 @@ async function loadAdminRentals() {
           </div>
           <p class="text-sm text-neutral-600">iPhone: ${rental.iphone_name || 'N/A'}</p>
           <p class="text-sm text-neutral-600">Pengguna: ${rental.user_name || 'N/A'}</p>
-          <p class="text-sm text-neutral-600">Periode: ${formatDate(rental.rental_start_date)} - ${formatDate(rental.rental_end_date)}</p>
+          <p class="text-sm text-neutral-600">Periode: ${formatDate(rental.rental_start_date || '')} - ${formatDate(rental.rental_end_date || '')}</p>
           <button onclick="returnRental(${rental.id})" class="btn btn-sm btn-primary mt-2">Proses Return</button>
         </div>
       `).join('') : '<p class="text-neutral-500">Tidak ada rental aktif yang sesuai</p>';
@@ -110,7 +110,7 @@ async function loadAdminRentals() {
             </div>
             <div>
               <p class="text-sm font-medium text-neutral-700">Jatuh Tempo</p>
-              <p class="text-sm text-neutral-600">${formatDate(rental.rental_end_date)}</p>
+              <p class="text-sm text-neutral-600">${formatDate(rental.rental_end_date || '')}</p>
             </div>
             <div>
               <p class="text-sm font-medium text-neutral-700">Hari Terlambat</p>
@@ -139,7 +139,7 @@ async function loadAdminRentals() {
     renderRentals(activeRentalsAdmin, overdueRentalsAdmin);
 
     // Store overdue rentals data globally for detail modal
-    (window as any).overdueRentalsData = overdueRentalsAdmin;
+    window.overdueRentalsData = overdueRentalsAdmin;
 
     const searchInput = document.getElementById('rental-search') as HTMLInputElement | null;
 
@@ -147,12 +147,12 @@ async function loadAdminRentals() {
       if (!searchInput) return;
       const searchText = searchInput.value.toLowerCase();
 
-      const filteredActive = activeRentals.filter((rental: import('../../types').Rental) =>
+      const filteredActive = activeRentalsAdmin.filter((rental: import('../../types').AdminRental) =>
         rental.id.toString().includes(searchText) ||
         (rental.user_name || '').toLowerCase().includes(searchText)
       );
 
-      const filteredOverdue = overdueRentals.filter((rental: import('../../types').Rental) =>
+      const filteredOverdue = overdueRentalsAdmin.filter((rental: import('../../types').AdminRental) =>
         rental.id.toString().includes(searchText) ||
         (rental.user_name || '').toLowerCase().includes(searchText)
       );
@@ -162,7 +162,7 @@ async function loadAdminRentals() {
 
     if (searchInput) searchInput.addEventListener('input', applySearch);
 
-    (window as any).returnRental = async (rentalId: number) => {
+    window.returnRental = async (rentalId: number) => {
       const today = new Date().toISOString().split('T')[0];
       try {
         await adminAPI.rentals.return(rentalId, today);
@@ -174,8 +174,8 @@ async function loadAdminRentals() {
       }
     };
 
-    (window as any).showOverdueDetail = (rentalId: number) => {
-      const rental = (window as any).overdueRentalsData.find((r: any) => r.id === rentalId);
+    window.showOverdueDetail = (rentalId: number) => {
+      const rental = window.overdueRentalsData.find((r: any) => r.id === rentalId);
       if (!rental) return;
 
       const modalContent = `

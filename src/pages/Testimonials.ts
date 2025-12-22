@@ -70,16 +70,18 @@ async function loadTestimonials() {
   try {
     const response = await testimonialAPI.getAll();
     const testimonials = response.data.data;
+    const container = document.getElementById('testimonials-container');
+
+    if (!container) return;
 
     if (!Array.isArray(testimonials) || testimonials.length === 0) {
-      document.getElementById('testimonials-container').innerHTML = EmptyState(
+      container.innerHTML = EmptyState(
         'Belum Ada Testimoni',
         'Jadilah pelanggan pertama yang memberikan testimoni'
       );
       return;
     }
 
-    const container = document.getElementById('testimonials-container');
     container.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         ${testimonials.map(testimonial => `
@@ -107,55 +109,63 @@ async function loadTestimonials() {
     `;
   } catch (error) {
     console.error('Error loading testimonials:', error);
-    document.getElementById('testimonials-container').innerHTML = ErrorMessage(
-      'Gagal memuat testimoni. Silakan coba lagi.'
-    );
+    const container = document.getElementById('testimonials-container');
+    if (container) {
+      container.innerHTML = ErrorMessage('Gagal memuat testimoni. Silakan coba lagi.');
+    }
   }
 }
 
 function setupTestimonialHandlers() {
   // Rating stars functionality
   const ratingStars = document.getElementById('rating-stars');
-  const ratingInput = document.getElementById('rating');
+  const ratingInput = document.getElementById('rating') as HTMLInputElement | null;
   const ratingText = document.getElementById('rating-text');
 
   if (ratingStars) {
-    ratingStars.addEventListener('click', (e) => {
-      if (e.target.classList.contains('star-btn')) {
-        const rating = parseInt(e.target.dataset.rating);
-        ratingInput.value = rating;
+    ratingStars.addEventListener('click', (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && target.classList.contains('star-btn')) {
+        const rating = parseInt(target.dataset.rating || '0', 10);
+        if (ratingInput) ratingInput.value = String(rating);
 
         // Update star colors
         const stars = ratingStars.querySelectorAll('.star-btn');
         stars.forEach((star, index) => {
+          const el = star as HTMLElement;
           if (index < rating) {
-            star.classList.remove('text-neutral-300');
-            star.classList.add('text-warning');
+            el.classList.remove('text-neutral-300');
+            el.classList.add('text-warning');
           } else {
-            star.classList.remove('text-warning');
-            star.classList.add('text-neutral-300');
+            el.classList.remove('text-warning');
+            el.classList.add('text-neutral-300');
           }
         });
 
         // Update rating text
         const ratingTexts = ['Sangat Buruk', 'Buruk', 'Cukup', 'Baik', 'Sangat Baik'];
-        ratingText.textContent = `${rating}/5 - ${ratingTexts[rating - 1]}`;
-        ratingText.classList.remove('text-neutral-500');
-        ratingText.classList.add('text-neutral-700');
+        if (ratingText) {
+          ratingText.textContent = `${rating}/5 - ${ratingTexts[rating - 1]}`;
+          ratingText.classList.remove('text-neutral-500');
+          ratingText.classList.add('text-neutral-700');
+        }
       }
     });
   }
 
   // Testimonial form submission
-  const testimonialForm = document.getElementById('testimonial-form');
-  if (testimonialForm) {
-    testimonialForm.addEventListener('submit', async (e) => {
+  const testimonialFormEl = document.getElementById('testimonial-form') as HTMLFormElement | null;
+  if (testimonialFormEl) {
+    testimonialFormEl.addEventListener('submit', async (e: Event) => {
       e.preventDefault();
 
-      const formData = new FormData(testimonialForm);
+      const formData = new FormData(testimonialFormEl);
+      const ratingVal = formData.get('rating');
+      const messageVal = formData.get('message');
+
       const data = {
-        rating: parseInt(formData.get('rating')),
-        message: formData.get('message').trim()
+        rating: parseInt(String(ratingVal || '0'), 10),
+        message: String(messageVal || '').trim()
       };
 
       if (!data.rating || data.rating < 1 || data.rating > 5) {
@@ -168,12 +178,14 @@ function setupTestimonialHandlers() {
         return;
       }
 
-      const submitBtn = testimonialForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
+      const submitBtn = testimonialFormEl.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+      const originalText = submitBtn?.textContent || '';
 
       try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Mengirim...';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Mengirim...';
+        }
 
         await testimonialAPI.create(data);
         showNotification('Testimoni berhasil dikirim! Terima kasih atas feedback Anda.', 'success');
@@ -184,28 +196,31 @@ function setupTestimonialHandlers() {
         // Reload testimonials
         loadTestimonials();
 
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating testimonial:', error);
-        const errorMessage = error.response?.data?.message || 'Gagal mengirim testimoni. Silakan coba lagi.';
+        const errorMessage = error?.response?.data?.message || 'Gagal mengirim testimoni. Silakan coba lagi.';
         showNotification(errorMessage, 'error');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
       }
     });
   }
 }
 
 function resetTestimonialForm() {
-  const testimonialForm = document.getElementById('testimonial-form');
-  if (testimonialForm) {
-    testimonialForm.reset();
+  const testimonialFormEl = document.getElementById('testimonial-form') as HTMLFormElement | null;
+  if (testimonialFormEl) {
+    testimonialFormEl.reset();
 
     // Reset rating stars
     const stars = document.querySelectorAll('.star-btn');
     stars.forEach(star => {
-      star.classList.remove('text-warning');
-      star.classList.add('text-neutral-300');
+      const el = star as HTMLElement;
+      el.classList.remove('text-warning');
+      el.classList.add('text-neutral-300');
     });
 
     // Reset rating text

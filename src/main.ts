@@ -146,20 +146,20 @@ router.setNotFound(() => {
   `;
 });
 
-(window as any).handleLogout = () => {
+window.handleLogout = () => {
   showLogoutConfirmation();
 };
 
 // Make modal functions global
-(window as any).showLogoutConfirmation = showLogoutConfirmation;
-(window as any).closeModal = closeModal;
-(window as any).confirmLogout = confirmLogout;
-(window as any).showOrderSuccessModal = showOrderSuccessModal;
-(window as any).confirmDelete = confirmDelete;
-(window as any).closeAppVersionModal = closeAppVersionModal;
-(window as any).closeNewVersionModal = closeNewVersionModal;
-(window as any).dismissAppAnnouncement = dismissAppAnnouncement;
-(window as any).goToOrders = () => {
+window.showLogoutConfirmation = showLogoutConfirmation;
+window.closeModal = closeModal;
+window.confirmLogout = confirmLogout;
+window.showOrderSuccessModal = showOrderSuccessModal;
+window.confirmDelete = confirmDelete;
+window.closeAppVersionModal = closeAppVersionModal;
+window.closeNewVersionModal = closeNewVersionModal;
+window.dismissAppAnnouncement = dismissAppAnnouncement;
+window.goToOrders = () => {
   router.navigate('/orders');
 };
 

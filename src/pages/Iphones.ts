@@ -2,6 +2,7 @@ import { Navbar, Footer } from '../components/layout/Layout.js';
 import { LoadingSpinner, EmptyState, ErrorMessage } from '../components/common/index.js';
 import { iphoneAPI } from '../js/api/endpoints.js';
 import { formatCurrency } from '../js/utils/helpers.js';
+import type { IPhone } from '../types/index.js';
 
 export async function IphonesPage() {
   const app = document.getElementById('app');
@@ -59,15 +60,18 @@ export async function IphonesPage() {
   loadIphones();
 }
 
-let allIphones = [];
+let allIphones: IPhone[] = [];
 
 async function loadIphones() {
   try {
     const response = await iphoneAPI.getAll();
     allIphones = response.data.data || [];
+    const container = document.getElementById('iphones-container');
+
+    if (!container) return;
 
     if (!Array.isArray(allIphones) || allIphones.length === 0) {
-      document.getElementById('iphones-container').innerHTML = EmptyState(
+      container.innerHTML = EmptyState(
         'Tidak Ada Produk',
         'Produk iPhone masih kosong. Silakan kembali nanti.'
       );
@@ -80,41 +84,44 @@ async function loadIphones() {
     setupSearchAndSort();
   } catch (error) {
     console.error('Error loading iphones:', error);
-    document.getElementById('iphones-container').innerHTML = `
-      <div class="col-span-full">
-        ${ErrorMessage('Gagal memuat produk. Silakan coba lagi.')}
-      </div>
-    `;
+    const container = document.getElementById('iphones-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="col-span-full">
+          ${ErrorMessage('Gagal memuat produk. Silakan coba lagi.')}
+        </div>
+      `;
+    }
   }
 }
 
 function setupSearchAndSort() {
-  const searchInput = document.getElementById('search-input');
-  const sortSelect = document.getElementById('sort-select');
+  const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement | null;
 
   const applyFilters = () => {
-    const searchTerm = searchInput.value.toLowerCase();
-    const sortBy = sortSelect.value;
+    const searchTerm = (searchInput?.value || '').toLowerCase();
+    const sortBy = sortSelect?.value || 'default';
 
-    let filtered = allIphones.filter(iphone => {
-      const nameMatch = iphone.name.toLowerCase().includes(searchTerm);
-      const specsMatch = iphone.specs.toLowerCase().includes(searchTerm);
+    let filtered = allIphones.filter((iphone: IPhone) => {
+      const nameMatch = (iphone.name || '').toLowerCase().includes(searchTerm);
+      const specsMatch = (iphone.specs || '').toLowerCase().includes(searchTerm);
       return nameMatch || specsMatch;
     });
 
     // Apply sorting
     switch (sortBy) {
       case 'price-low':
-        filtered.sort((a, b) => a.price_per_day - b.price_per_day);
+        filtered.sort((a, b) => (a.price_per_day || 0) - (b.price_per_day || 0));
         break;
       case 'price-high':
-        filtered.sort((a, b) => b.price_per_day - a.price_per_day);
+        filtered.sort((a, b) => (b.price_per_day || 0) - (a.price_per_day || 0));
         break;
       case 'name-asc':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
         break;
       case 'name-desc':
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        filtered.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
         break;
       default:
         // Keep original order
@@ -124,20 +131,21 @@ function setupSearchAndSort() {
     renderIphones(filtered);
   };
 
-  searchInput.addEventListener('input', applyFilters);
-  sortSelect.addEventListener('change', applyFilters);
+  if (searchInput) searchInput.addEventListener('input', applyFilters);
+  if (sortSelect) sortSelect.addEventListener('change', applyFilters);
 }
 
-function renderIphones(iphones) {
+function renderIphones(iphones: IPhone[]) {
   const container = document.getElementById('iphones-container');
+  if (!container) return;
 
-  if (iphones.length === 0) {
+  if (!Array.isArray(iphones) || iphones.length === 0) {
     container.innerHTML = `<div class="col-span-full">${EmptyState('Tidak Ada Produk', 'Tidak ada produk yang sesuai dengan pencarian Anda.')}</div>`;
     return;
   }
 
-  container.innerHTML = iphones.map(iphone => {
-    const imageUrl = iphone.images && typeof iphone.images === 'string' ? iphone.images : null;
+  container.innerHTML = iphones.map((iphone: IPhone) => {
+    const imageUrl = Array.isArray(iphone.images) && iphone.images.length ? iphone.images[0] : null;
     return `
     <div class="card-hover cursor-pointer" onclick="window.location.href = '/iphones/${iphone.id}'">
       <div class="h-64 bg-neutral-200 rounded-lg mb-4 overflow-hidden flex items-center justify-center">

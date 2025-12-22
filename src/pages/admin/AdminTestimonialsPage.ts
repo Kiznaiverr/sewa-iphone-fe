@@ -137,9 +137,9 @@ async function loadAdminTestimonials() {
 
     if (searchInput) searchInput.addEventListener('input', applySearch);
 
-    (window as any).deleteTestimonial = async (testimonialId: number) => {
+    window.deleteTestimonial = async (testimonialId: number) => {
       // Set up the callback for actual deletion
-      (window as any).__deleteTestimonialCallback = async (id: number) => {
+      window.__deleteTestimonialCallback = async (id: number) => {
         try {
           await adminAPI.testimonials.delete(id);
           showAlertModal('Testimoni berhasil dihapus!', true);
@@ -156,6 +156,7 @@ async function loadAdminTestimonials() {
 
   } catch (error) {
     console.error('Error loading admin testimonials:', error);
-    document.getElementById('testimonials-list').innerHTML = ErrorMessage('Gagal memuat data testimoni');
+    const testimonialsListEl = document.getElementById('testimonials-list');
+    if (testimonialsListEl) testimonialsListEl.innerHTML = ErrorMessage('Gagal memuat data testimoni');
   }
 }

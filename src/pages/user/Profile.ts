@@ -478,5 +478,5 @@ function cancelEdit() {
 }
 
 // Make functions global so they can be called from onclick
-(window as any).showEditForm = showEditForm;
-(window as any).cancelEdit = cancelEdit;
+window.showEditForm = showEditForm;
+window.cancelEdit = cancelEdit;

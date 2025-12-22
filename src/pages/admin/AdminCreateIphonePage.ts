@@ -76,7 +76,7 @@ async function handleCreateIphone(e: Event) {
     await adminAPI.iphones.create(formData);
     showAlertModal('iPhone berhasil ditambahkan!', true);
     setTimeout(() => {
-      const router = (window as any).__router;
+      const router = window.__router;
       router.navigate('/admin/iphones');
     }, 2000);
   } catch (error) {

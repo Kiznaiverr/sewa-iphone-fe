@@ -59,8 +59,10 @@ export async function AdminUsersPage() {
 
   loadAdminUsers('active');
 
-  document.getElementById('status-filter').addEventListener('change', (e) => {
-    loadAdminUsers(e.target.value);
+  const statusFilter = document.getElementById('status-filter') as HTMLSelectElement | null;
+  if (statusFilter) statusFilter.addEventListener('change', (e) => {
+    const target = e.target as HTMLSelectElement | null;
+    if (target) loadAdminUsers(target.value);
   });
 }
 
@@ -147,7 +149,7 @@ async function loadAdminUsers(status = 'active') {
       return String(unsafe || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     };
 
-    (window as any).editUser = (userId: number) => {
+    window.editUser = (userId: number) => {
       const user = users.find((u: import('../../types').User) => u.id === userId);
       if (!user) return;
 
@@ -162,7 +164,7 @@ async function loadAdminUsers(status = 'active') {
 
       const footer = `
         <button onclick="closeModal()" class="px-4 py-2 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-all duration-200 font-medium">Batal</button>
-        <button onclick="(window as any).__saveUserEdit(${userId})" class="btn btn-primary">Simpan</button>
+        <button onclick="window.__saveUserEdit(${userId})" class="btn btn-primary">Simpan</button>
       `;
 
       const modalHtml = Modal('Edit Pengguna', content, footer);
@@ -177,7 +179,7 @@ async function loadAdminUsers(status = 'active') {
       modalContainer.innerHTML = modalHtml;
 
       // attach save handler globally so inline onclick can call it
-      (window as any).__saveUserEdit = async (id: number) => {
+      window.__saveUserEdit = async (id: number) => {
         const name = (document.getElementById('edit-user-name') as HTMLInputElement | null)?.value ?? '';
         const email = (document.getElementById('edit-user-email') as HTMLInputElement | null)?.value ?? '';
 
@@ -193,7 +195,7 @@ async function loadAdminUsers(status = 'active') {
       };
     };
 
-    (window as any).deleteUser = async (userId: number, type: 'soft' | 'hard') => {
+    window.deleteUser = async (userId: number, type: 'soft' | 'hard') => {
       const title = type === 'soft' ? 'Nonaktifkan Pengguna' : 'Hapus Pengguna';
       const message = type === 'soft'
         ? 'Nonaktifkan pengguna ini? Pengguna masih bisa diaktifkan kembali.'
@@ -216,6 +218,7 @@ async function loadAdminUsers(status = 'active') {
     };
   } catch (error) {
     console.error('Error loading admin users:', error);
-    document.getElementById('users-list').innerHTML = ErrorMessage('Gagal memuat data pengguna');
+    const usersListEl = document.getElementById('users-list');
+    if (usersListEl) usersListEl.innerHTML = ErrorMessage('Gagal memuat data pengguna');
   }
 }

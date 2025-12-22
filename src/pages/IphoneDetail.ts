@@ -113,7 +113,7 @@ async function loadIphoneDetail(id: string) {
         endDateInput.addEventListener('change', onDateChange);
       }
 
-      (window as any).submitOrder = async (iphoneId: number) => {
+      window.submitOrder = async (iphoneId: number) => {
         const startDate = startDateInput?.value ?? '';
         const endDate = endDateInput?.value ?? '';
 
@@ -166,8 +166,9 @@ async function loadIphoneDetail(id: string) {
     }
   } catch (error) {
     console.error('Error loading iphone detail:', error);
-    document.getElementById('detail-container').innerHTML = ErrorMessage(
-      'Gagal memuat detail produk. Silakan coba lagi.'
-    );
+    const container = document.getElementById('detail-container');
+    if (container) {
+      container.innerHTML = ErrorMessage('Gagal memuat detail produk. Silakan coba lagi.');
+    }
   }
 }

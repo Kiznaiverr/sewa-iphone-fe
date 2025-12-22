@@ -147,7 +147,7 @@ async function loadAdminIphones() {
       return String(unsafe || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     };
 
-    (window as any).editIphone = (id: number) => {
+    window.editIphone = (id: number) => {
       const iphone = iphones.find((i: any) => i.id === id);
       if (!iphone) return;
 
@@ -190,7 +190,7 @@ async function loadAdminIphones() {
       modalContainer.innerHTML = modalHtml;
 
       // attach save handler globally so inline onclick can call it
-      (window as any).__saveIphoneEdit = async (iphoneId: number) => {
+      window.__saveIphoneEdit = async (iphoneId: number) => {
         const name = (document.getElementById('edit-iphone-name') as HTMLInputElement | null)?.value || '';
         const price_per_day = parseFloat((document.getElementById('edit-iphone-price') as HTMLInputElement | null)?.value || '0');
         const specs = (document.getElementById('edit-iphone-specs') as HTMLTextAreaElement | null)?.value || '';
@@ -209,7 +209,7 @@ async function loadAdminIphones() {
       };
     };
 
-    (window as any).deleteIphone = (id: number) => {
+    window.deleteIphone = (id: number) => {
       showUserActionModal('Hapus iPhone', 'Yakin ingin menghapus iPhone ini? Tindakan ini tidak dapat dibatalkan!', async () => {
         try {
           await adminAPI.iphones.delete(id);

@@ -136,7 +136,7 @@ async function loadAdminOrders() {
     if (searchInput) searchInput.addEventListener('input', applyFilters);
     if (statusFilter) statusFilter.addEventListener('change', applyFilters);
 
-    (window as any).showUpdateStatusModal = (orderId: number, currentStatus: string) => {
+    window.showUpdateStatusModal = (orderId: number, currentStatus: string) => {
       let modalContainer = document.getElementById('modal-container');
       if (!modalContainer) {
         modalContainer = document.createElement('div');
@@ -173,7 +173,7 @@ async function loadAdminOrders() {
       modalContainer.innerHTML = modal;
     };
 
-    (window as any).updateOrderStatus = async (orderId: number, newStatus: string) => {
+    window.updateOrderStatus = async (orderId: number, newStatus: string) => {
       try {
         await adminAPI.orders.updateStatus(orderId, newStatus);
         showAlertModal(`Pesanan berhasil diubah menjadi ${newStatus}`, true);
@@ -184,6 +184,7 @@ async function loadAdminOrders() {
     };
   } catch (error) {
     console.error('Error loading admin orders:', error);
-    document.getElementById('orders-list').innerHTML = ErrorMessage('Gagal memuat data pesanan');
+    const ordersListEl = document.getElementById('orders-list');
+    if (ordersListEl) ordersListEl.innerHTML = ErrorMessage('Gagal memuat data pesanan');
   }
 }

@@ -2,9 +2,11 @@ import { Navbar, Footer } from '../../components/layout/Layout.js';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../../components/common/index.js';
 import { userAPI } from '../../js/api/endpoints.js';
 import { formatDate, formatCurrency } from '../../js/utils/helpers.js';
+import type { AdminRental } from '../../types/index.js';
 
 export async function RentalsPage() {
   const app = document.getElementById('app');
+  if (!app) return;
 
   app.innerHTML = `
     ${Navbar()}
@@ -90,23 +92,28 @@ async function loadRentals() {
         const penaltyWarning = document.getElementById('penalty-warning');
         const penaltyMessage = document.getElementById('penalty-message');
 
-        penaltyWarning.classList.remove('hidden');
-        penaltyMessage.textContent = penaltyInfo.warning;
+        if (penaltyWarning && penaltyMessage && penaltyInfo) {
+          penaltyWarning.classList.remove('hidden');
+          penaltyMessage.textContent = penaltyInfo.warning;
+        }
       }
     }
 
-    renderActiveRentals(activeRentals);
-    renderOverdueRentals(penaltyInfo?.overdue_rentals || []);
+    renderActiveRentals(activeRentals as AdminRental[]);
+    renderOverdueRentals((penaltyInfo?.overdue_rentals || []) as AdminRental[]);
 
   } catch (error) {
     console.error('Error loading rentals:', error);
-    document.getElementById('active-rentals').innerHTML = ErrorMessage('Gagal memuat data rental aktif');
-    document.getElementById('overdue-rentals').innerHTML = ErrorMessage('Gagal memuat data rental overdue');
+    const activeContainer = document.getElementById('active-rentals');
+    const overdueContainer = document.getElementById('overdue-rentals');
+    if (activeContainer) activeContainer.innerHTML = ErrorMessage('Gagal memuat data rental aktif');
+    if (overdueContainer) overdueContainer.innerHTML = ErrorMessage('Gagal memuat data rental overdue');
   }
 }
 
-function renderActiveRentals(rentals) {
+function renderActiveRentals(rentals: AdminRental[]) {
   const container = document.getElementById('active-rentals');
+  if (!container) return;
 
   if (!Array.isArray(rentals) || rentals.length === 0) {
     container.innerHTML = EmptyState('Tidak Ada Rental Aktif', 'Anda belum memiliki penyewaan iPhone yang sedang berlangsung');
@@ -115,7 +122,7 @@ function renderActiveRentals(rentals) {
 
   container.innerHTML = `
     <div class="space-y-4">
-      ${rentals.map(rental => `
+      ${rentals.map((rental: AdminRental) => `
         <div class="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 transition-colors">
           <div class="flex justify-between items-start mb-3">
             <div>
@@ -128,25 +135,25 @@ function renderActiveRentals(rentals) {
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p class="text-xs font-medium text-neutral-500 uppercase tracking-wide">Tanggal Mulai</p>
-              <p class="text-sm font-semibold">${formatDate(rental.rental_start_date)}</p>
+              <p class="text-sm font-semibold">${formatDate(rental.rental_start_date || '')}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-neutral-500 uppercase tracking-wide">Tanggal Akhir</p>
-              <p class="text-sm font-semibold">${formatDate(rental.rental_end_date)}</p>
+              <p class="text-sm font-semibold">${formatDate(rental.rental_end_date || '')}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-neutral-500 uppercase tracking-wide">Harga/Hari</p>
-              <p class="text-sm font-semibold">${formatCurrency(rental.price_per_day)}</p>
+              <p class="text-sm font-semibold">${formatCurrency(Number(rental.price_per_day) || 0)}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-neutral-500 uppercase tracking-wide">Total</p>
-              <p class="text-sm font-semibold">${formatCurrency(rental.order_total)}</p>
+              <p class="text-sm font-semibold">${formatCurrency(Number(rental.order_total) || 0)}</p>
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-3 border-t border-neutral-200">
             <div class="text-xs text-neutral-500">
-              Dibuat: ${formatDate(rental.created_at)}
+              Dibuat: ${formatDate(rental.created_at || '')}
             </div>
             <div class="text-xs text-neutral-500">
               Status: <span class="capitalize">${rental.status}</span>
@@ -158,8 +165,9 @@ function renderActiveRentals(rentals) {
   `;
 }
 
-function renderOverdueRentals(overdueRentals) {
+function renderOverdueRentals(overdueRentals: AdminRental[]) {
   const container = document.getElementById('overdue-rentals');
+  if (!container) return;
 
   if (!Array.isArray(overdueRentals) || overdueRentals.length === 0) {
     container.innerHTML = `
@@ -178,7 +186,7 @@ function renderOverdueRentals(overdueRentals) {
 
   container.innerHTML = `
     <div class="space-y-4">
-      ${overdueRentals.map(rental => `
+      ${overdueRentals.map((rental: AdminRental) => `
         <div class="border border-error border-opacity-30 rounded-lg p-4 bg-error bg-opacity-5">
           <div class="flex justify-between items-start mb-3">
             <div>
@@ -195,11 +203,11 @@ function renderOverdueRentals(overdueRentals) {
             </div>
             <div>
               <p class="text-xs font-medium text-neutral-500 uppercase tracking-wide">Denda/Hari</p>
-              <p class="text-sm font-semibold text-neutral-900">${formatCurrency(rental.daily_penalty)}</p>
+              <p class="text-sm font-semibold text-neutral-900">${formatCurrency(Number(rental.penalty_per_day) || 0)}</p>
             </div>
             <div class="col-span-2">
               <p class="text-xs font-medium text-neutral-500 uppercase tracking-wide">Total Denda</p>
-              <p class="text-xl font-bold text-error">${formatCurrency(rental.penalty_amount)}</p>
+              <p class="text-xl font-bold text-error">${formatCurrency(Number(rental.total_penalty) || 0)}</p>
             </div>
           </div>
 

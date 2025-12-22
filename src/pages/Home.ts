@@ -299,8 +299,12 @@ async function loadTestimonials() {
     const allTestimonials = response.data.data;
     const testimonials = allTestimonials.slice(0, 3); // Only show 3 testimonials
 
+    const container = document.getElementById('testimonials-container');
+
+    if (!container) return;
+
     if (!Array.isArray(testimonials) || testimonials.length === 0) {
-      document.getElementById('testimonials-container').innerHTML = `
+      container.innerHTML = `
         <div class="text-center py-12">
           <div class="max-w-md mx-auto">
             <div class="w-16 h-16 bg-primary-100 rounded-full flex-center mx-auto mb-4">
@@ -317,7 +321,6 @@ async function loadTestimonials() {
       return;
     }
 
-    const container = document.getElementById('testimonials-container');
     container.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         ${testimonials.map(testimonial => `
@@ -351,11 +354,14 @@ async function loadTestimonials() {
     `;
   } catch (error) {
     console.error('Error loading testimonials:', error);
-    document.getElementById('testimonials-container').innerHTML = `
-      <div class="col-span-full">
-        ${ErrorMessage('Gagal memuat testimoni.')}
-      </div>
-    `;
+    const container = document.getElementById('testimonials-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="col-span-full">
+          ${ErrorMessage('Gagal memuat testimoni.')}
+        </div>
+      `;
+    }
   }
 }
 

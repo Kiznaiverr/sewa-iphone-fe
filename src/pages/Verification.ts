@@ -100,7 +100,8 @@ function setupVerificationHandlers() {
 }
 
 async function sendVerificationCode() {
-  const sendBtn = document.getElementById('send-code-btn');
+  const sendBtn = document.getElementById('send-code-btn') as HTMLButtonElement | null;
+  if (!sendBtn) return;
   const originalText = sendBtn.textContent;
 
   try {
@@ -112,15 +113,18 @@ async function sendVerificationCode() {
     showNotification('Kode verifikasi telah dikirim ke WhatsApp Anda', 'success');
 
     // Switch to verification input
-    document.getElementById('send-code-section').classList.add('hidden');
-    document.getElementById('verify-code-section').classList.remove('hidden');
+    const sendSection = document.getElementById('send-code-section');
+    const verifySection = document.getElementById('verify-code-section');
+    if (sendSection) sendSection.classList.add('hidden');
+    if (verifySection) verifySection.classList.remove('hidden');
 
     // Focus on input
-    document.getElementById('verification-code').focus();
+    const codeInput = document.getElementById('verification-code') as HTMLInputElement | null;
+    if (codeInput) codeInput.focus();
 
   } catch (error) {
     console.error('Error sending verification code:', error);
-    const message = error.response?.data?.message || 'Gagal mengirim kode verifikasi';
+    const message = (error as any).response?.data?.message || 'Gagal mengirim kode verifikasi';
     showNotification(message, 'error');
   } finally {
     sendBtn.disabled = false;
@@ -129,29 +133,34 @@ async function sendVerificationCode() {
 }
 
 async function verifyCode() {
-  const code = document.getElementById('verification-code').value.trim();
-  const verifyBtn = document.getElementById('verify-btn');
+  const codeInput = document.getElementById('verification-code') as HTMLInputElement | null;
+  const code = codeInput?.value.trim() ?? '';
+  const verifyBtn = document.getElementById('verify-btn') as HTMLButtonElement | null;
 
   if (!code || code.length !== 6) {
     showNotification('Masukkan kode verifikasi 6 digit', 'error');
     return;
   }
 
+  if (!verifyBtn) return;
+
   try {
     verifyBtn.disabled = true;
     verifyBtn.textContent = 'Memverifikasi...';
 
-    await authAPI.verifyCode(code);
+    await authAPI.verifyCode({ code });
 
     showNotification('Verifikasi berhasil!', 'success');
 
     // Show success section
-    document.getElementById('verify-code-section').classList.add('hidden');
-    document.getElementById('success-section').classList.remove('hidden');
+    const verifySection = document.getElementById('verify-code-section');
+    const successSection = document.getElementById('success-section');
+    if (verifySection) verifySection.classList.add('hidden');
+    if (successSection) successSection.classList.remove('hidden');
 
   } catch (error) {
     console.error('Error verifying code:', error);
-    const message = error.response?.data?.message || 'Kode verifikasi salah atau kadaluarsa';
+    const message = (error as any).response?.data?.message || 'Kode verifikasi salah atau kadaluarsa';
     showNotification(message, 'error');
   } finally {
     verifyBtn.disabled = false;
@@ -160,7 +169,8 @@ async function verifyCode() {
 }
 
 async function resendCode() {
-  const resendBtn = document.getElementById('resend-btn');
+  const resendBtn = document.getElementById('resend-btn') as HTMLButtonElement | null;
+  if (!resendBtn) return;
   const originalText = resendBtn.textContent;
 
   try {
@@ -173,7 +183,7 @@ async function resendCode() {
 
   } catch (error) {
     console.error('Error resending verification code:', error);
-    const message = error.response?.data?.message || 'Gagal mengirim ulang kode verifikasi';
+    const message = (error as any).response?.data?.message || 'Gagal mengirim ulang kode verifikasi';
     showNotification(message, 'error');
   } finally {
     resendBtn.disabled = false;
@@ -182,9 +192,12 @@ async function resendCode() {
 }
 
 function backToSend() {
-  document.getElementById('verify-code-section').classList.add('hidden');
-  document.getElementById('send-code-section').classList.remove('hidden');
-  document.getElementById('verification-code').value = '';
+  const verifySection = document.getElementById('verify-code-section');
+  const sendSection = document.getElementById('send-code-section');
+  const codeInput = document.getElementById('verification-code') as HTMLInputElement | null;
+  if (verifySection) verifySection.classList.add('hidden');
+  if (sendSection) sendSection.classList.remove('hidden');
+  if (codeInput) codeInput.value = '';
 }
 
 // Make functions global so they can be called from onclick

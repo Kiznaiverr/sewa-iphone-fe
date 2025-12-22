@@ -3,9 +3,9 @@ import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/common/i
 import { userAPI } from '../js/api/endpoints.js';
 import { formatCurrency, formatDate, isAuthenticated } from '../js/utils/helpers.js';
 
-function calculateDuration(startDate, endDate) {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+function calculateDuration(startDate: string | number | Date, endDate: string | number | Date) {
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
   const diffTime = Math.abs(end - start);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
@@ -45,7 +45,7 @@ export async function TrackOrderPage(code: string) {
   loadTrackingData(code);
 }
 
-async function loadTrackingData(code) {
+async function loadTrackingData(code: string) {
   try {
     const response = await userAPI.trackOrder(code);
     const order = response.data.data;
@@ -54,6 +54,7 @@ async function loadTrackingData(code) {
     const currentStep = statusSteps.indexOf(order.status);
 
     const container = document.getElementById('track-container');
+    if (!container) return;
     container.innerHTML = `
       <div class="card mb-6">
         <h2 class="text-2xl font-bold mb-6">Informasi Pesanan</h2>
@@ -128,6 +129,8 @@ async function loadTrackingData(code) {
   } catch (error) {
     console.error('Error loading tracking data:', error);
     const container = document.getElementById('track-container');
-    container.innerHTML = ErrorMessage('Gagal memuat data pesanan. Periksa kode pesanan Anda.');
+    if (container) {
+      container.innerHTML = ErrorMessage('Gagal memuat data pesanan. Periksa kode pesanan Anda.');
+    }
   }
 }
